@@ -9,9 +9,14 @@ const ACCESS_PASSWORD = '***REMOVED***';
 export default function HomePage() {
   const [password, setPassword] = useState('');
   const [unlocked, setUnlocked] = useState(false);
+  const [message, setMessage] = useState('Members enter the shared password to unlock the dashboard.');
 
   useEffect(() => {
-    setUnlocked(window.localStorage.getItem('slutwalk-access') === 'true');
+    const isUnlocked = window.localStorage.getItem('slutwalk-access') === 'true';
+    setUnlocked(isUnlocked);
+    if (isUnlocked) {
+      setMessage('Welcome back. Your member dashboard is ready.');
+    }
   }, []);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -21,11 +26,13 @@ export default function HomePage() {
       window.localStorage.setItem('slutwalk-access', 'true');
       setUnlocked(true);
       setPassword('');
+      setMessage('Welcome back. Your member dashboard is ready.');
       return;
     }
 
     window.localStorage.removeItem('slutwalk-access');
     setUnlocked(false);
+    setMessage('Incorrect password. Please try again or contact an organizer.');
   };
 
   return (
@@ -36,34 +43,32 @@ export default function HomePage() {
 
           <ul>
             <li><Link href="/about">About</Link></li>
-            <li><Link href="/archive">Archive</Link></li>
-            <li><Link href="/events">Events</Link></li>
-            <li><Link href="/zines">Zines</Link></li>
-            <li><Link href="/community">Community</Link></li>
+            <li><Link href="/shop">Store</Link></li>
+            <li><Link href="/bulletin">Bulletin</Link></li>
+            <li><Link href="/calendar">Calendar</Link></li>
+            <li><Link href="/admin-login">Admin</Link></li>
           </ul>
         </nav>
 
         <div className="hero-overlay">
-          <h1>
-            Reclaiming Space.
-            Building Community.
-            Ending Victim Blaming.
-          </h1>
+          <p className="eyebrow">Community hub</p>
+          <h1>$lutWalk Denver is a living collective.</h1>
 
           <p>
-            Survivor-led organizing, digital archives, community education, and
-            feminist media.
+            A public landing page for community information, a protected member dashboard,
+            and a separate administrator portal for organizers.
           </p>
 
-          <a className="btn" href="#login">
-            Become a Member
-          </a>
+          <div className="btn-row">
+            <a className="btn" href="#login">Unlock member space</a>
+            <Link className="btn btn-secondary" href="/admin-login">Administrator portal</Link>
+          </div>
         </div>
       </header>
 
       <section id="login" className="login-card">
         <p className="eyebrow">Members only</p>
-        <h2>Access the community space</h2>
+        <h2>Enter the shared community password</h2>
         <form className="gate-form" onSubmit={handleSubmit}>
           <label htmlFor="password">Access password</label>
           <div className="form-row">
@@ -77,21 +82,58 @@ export default function HomePage() {
             />
             <button type="submit">Enter community</button>
           </div>
-          <p className="helper">Use the password shared with members to enter the private community space.</p>
+          <p className="helper">{message}</p>
         </form>
       </section>
 
       <section className="featured">
-        <p className="eyebrow">Featured campaign</p>
-        <h2>Join the next organizing circle.</h2>
+        <p className="eyebrow">Public landing page</p>
+        <h2>Built for organizing, education, and collective care.</h2>
         <p>
-          Help build the next action, share resources, and support survivor-led
-          organizing in Denver.
+          This landing view welcomes new visitors, shares community information,
+          and directs members into the protected pages for organizing and resource sharing.
         </p>
+        <div className="notice-grid">
+          <article>
+            <h3>Accessibility statement</h3>
+            <p>Keyboard-friendly navigation, strong contrast, and clear structure support inclusive access.</p>
+          </article>
+          <article>
+            <h3>Privacy notice</h3>
+            <p>Member access is stored locally in the browser for this prototype and can be cleared at any time.</p>
+          </article>
+        </div>
       </section>
 
       <section className={`content ${unlocked ? 'content--open' : 'content--locked'}`}>
-        <article className="timeline">
+        <p className="eyebrow">Member dashboard</p>
+        <h2>Welcome back, organizer.</h2>
+        <p>Move between the protected pages for about, store, bulletin board, calendar, and administration.</p>
+
+        <div className="dashboard-grid">
+          <Link className="dashboard-card" href="/about">
+            <h3>About SlutWalk Denver</h3>
+            <p>History, mission, values, archive links, and educational materials.</p>
+          </Link>
+          <Link className="dashboard-card" href="/shop">
+            <h3>Community Store</h3>
+            <p>Support the collective with apparel, zines, posters, and future event merch.</p>
+          </Link>
+          <Link className="dashboard-card" href="/bulletin">
+            <h3>Bulletin Board</h3>
+            <p>Announcements, volunteer opportunities, mutual aid requests, and discussion topics.</p>
+          </Link>
+          <Link className="dashboard-card" href="/calendar">
+            <h3>Community Calendar</h3>
+            <p>Meetings, marches, workshops, volunteer shifts, and community gatherings.</p>
+          </Link>
+          <Link className="dashboard-card" href="/admin-login">
+            <h3>Administrator Portal</h3>
+            <p>Separate access for moderation, archive uploads, event management, and member oversight.</p>
+          </Link>
+        </div>
+
+        <section className="timeline">
           <article>
             <h2>2011</h2>
             <p>First Denver SlutWalk.</p>
@@ -111,7 +153,7 @@ export default function HomePage() {
             <h2>2022</h2>
             <p>Archive and community media expansion.</p>
           </article>
-        </article>
+        </section>
 
         <section className="zines">
           <article className="zine-card">
