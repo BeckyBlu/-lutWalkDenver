@@ -6,11 +6,10 @@
     <title>SlutWalk Denver</title>
     <meta name="description" content="A survivor-led community space for SlutWalk Denver." />
     <link rel="stylesheet" href="styles.css" />
+    <script>window.SW_FALLBACK_PASSWORD = 'MEMBER_PASSWORD_PLACEHOLDER';</script>
+    <script src="/static/js/gate.js" defer></script>
   </head>
   <body>
-    <script>window.SW_AUTH_ENDPOINT = '/api/auth/login';</script>
-    <script src="/static/js/gate.js" defer></script>
-
     <main class="shell">
       <header class="hero">
         <nav>
@@ -44,7 +43,7 @@
       <section id="login" class="login-card">
         <p class="eyebrow">Members only</p>
         <h2>Enter the shared community password</h2>
-        <form class="gate-form" onsubmit="handleSubmit(event)">
+        <form class="gate-form">
           <label for="password">Access password</label>
           <div class="form-row gate-modal-buttons">
             <input

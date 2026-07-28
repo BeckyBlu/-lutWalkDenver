@@ -37,9 +37,9 @@ The site now includes:
 
 - [index.html](index.html) is the published landing page for GitHub Pages.
 - [styles.css](styles.css) provides the shared visual system for the static pages.
-- The additional static pages include [shop.html](shop.html), [bulletin.html](bulletin.html), [calendar.html](calendar.html), and [admin-login.html](admin-login.html).
+- The additional static pages include [zine.html](zine.html), [bulletin.html](bulletin.html), [calendar.html](calendar.html), [community.html](community.html), and [admin-login.html](admin-login.html).
 - [about.html](about.html) now redirects to the About section on [index.html](index.html#about).
-- Static member/admin pages load [static/js/auth-guard.js](static/js/auth-guard.js) so the current gate behavior stays centralized.
+- Static member/admin pages load [static/js/gate.js](static/js/gate.js) so the current gate behavior stays centralized.
 
 ### Next.js app
 
@@ -74,5 +74,5 @@ The site now includes:
 ## Notes
 
 - The static and Next versions are intentionally similar while remaining implemented differently.
-- The static pages share an external auth guard script, while the React version handles access in component state.
+- The static pages share an external gate script with local fallback passwords for the GitHub Pages build, while the React version handles access in component state.
 - The styling is built around a dark, neon-punk palette that can be extended with additional media later.

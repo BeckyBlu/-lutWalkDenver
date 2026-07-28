@@ -1,7 +1,13 @@
 (() => {
   const ACCESS_KEY = 'slutwalk-access';
+  const protectedPages = new Set(['bulletin.html', 'calendar.html', 'community.html', 'zine.html']);
   const authEndpoint = typeof window.SW_AUTH_ENDPOINT === 'string' ? window.SW_AUTH_ENDPOINT : '';
   const fallbackPassword = typeof window.SW_FALLBACK_PASSWORD === 'string' ? window.SW_FALLBACK_PASSWORD : '';
+
+  function currentPageName() {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    return parts[parts.length - 1] || 'index.html';
+  }
 
   function setUnlockedState(isUnlocked) {
     const content = document.querySelector('.content');
@@ -79,6 +85,11 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    if (protectedPages.has(currentPageName()) && window.localStorage.getItem(ACCESS_KEY) !== 'true') {
+      window.location.replace('index.html#login');
+      return;
+    }
+
     const form = document.querySelector('.gate-form');
     const declineBtn = document.getElementById('declineBtn');
 
