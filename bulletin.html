@@ -29,21 +29,175 @@
 
       <section class="featured">
         <h2>Community posts</h2>
-        <div class="community-board">
-          <article>
-            <h3>Announcements</h3>
-            <p>Volunteer sign-up, wellness reminders, and upcoming actions.</p>
-          </article>
-          <article>
-            <h3>Mutual aid</h3>
-            <p>Ride shares, food support, and local resource sharing.</p>
-          </article>
-          <article>
-            <h3>Discussion topics</h3>
-            <p>Education circles, event planning, and archive collaboration.</p>
-          </article>
+        <div class="bulletin-grid">
+          <div class="community-board">
+            <article>
+              <h3>Announcements</h3>
+              <p>Volunteer sign-up, wellness reminders, and upcoming actions.</p>
+            </article>
+            <article>
+              <h3>Mutual aid</h3>
+              <p>Ride shares, food support, and local resource sharing.</p>
+            </article>
+            <article>
+              <h3>Discussion topics</h3>
+              <p>Education circles, event planning, and archive collaboration.</p>
+            </article>
+          </div>
+
+          <section class="chat-container">
+            <header class="chat-header">
+              <h2>Community Chat</h2>
+              <span class="status">● Online</span>
+            </header>
+
+            <div class="chat-window" id="chatWindow">
+              <div class="message received">
+                <div class="avatar">SW</div>
+                <div class="bubble">
+                  <h4>Moderator</h4>
+                  <p>Welcome! Introduce yourself and be respectful.</p>
+                  <small>9:15 AM</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-input">
+              <input
+                type="text"
+                id="messageInput"
+                placeholder="Write a message..."
+                aria-label="Chat message"
+              >
+              <button id="sendBtn" type="button">Send</button>
+            </div>
+
+            <section class="new-thread">
+              <h2>Create New Thread</h2>
+              <input id="threadTitle" type="text" placeholder="Thread title" />
+              <textarea id="threadText" rows="5" placeholder="Start a discussion..."></textarea>
+              <input id="threadImage" type="file" accept="image/*" />
+              <button id="postThread" type="button">Post Thread</button>
+            </section>
+
+            <h3 class="thread-list-title">Recent Threads</h3>
+            <div id="threads"></div>
+          </section>
         </div>
       </section>
+
+      <script>
+        const threadsEl = document.getElementById('threads');
+        const chatWindow = document.getElementById('chatWindow');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function timeStamp() {
+          return new Date().toLocaleString();
+        }
+
+        function appendChatMessage(sender, text, sent = false) {
+          const message = document.createElement('div');
+          message.className = `message ${sent ? 'sent' : 'received'}`;
+          message.innerHTML = `
+            <div class="avatar">${sender.charAt(0).toUpperCase()}${sender.charAt(1) || ''}</div>
+            <div class="bubble">
+              <h4>${sender}</h4>
+              <p>${text.replace(/\n/g, '<br>')}</p>
+              <small>${timeStamp()}</small>
+            </div>
+          `;
+
+          chatWindow.appendChild(message);
+          chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function sendChatMessage() {
+          const value = messageInput.value.trim();
+          if (!value) return;
+
+          appendChatMessage('You', value, true);
+          messageInput.value = '';
+        }
+
+        sendBtn.addEventListener('click', sendChatMessage);
+        messageInput.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendChatMessage();
+          }
+        });
+
+        function createThread(title, text, imageSrc) {
+          const thread = document.createElement('article');
+          thread.className = 'thread';
+
+          thread.innerHTML = `
+            <div class="thread-header">
+              <strong>Anonymous</strong> • ${timeStamp()}
+            </div>
+            <div class="thread-body">
+              <h3>${title}</h3>
+              ${imageSrc ? `<img src="${imageSrc}" alt="Thread image">` : ''}
+              <p>${text.replace(/\n/g, '<br>')}</p>
+
+              <div class="replies"></div>
+            </div>
+
+            <div class="reply-form">
+              <textarea rows="3" placeholder="Write a reply..."></textarea>
+              <button>Reply</button>
+            </div>
+          `;
+
+          const replyBtn = thread.querySelector('.reply-form button');
+          const replyInput = thread.querySelector('.reply-form textarea');
+          const replies = thread.querySelector('.replies');
+
+          replyBtn.addEventListener('click', () => {
+            const value = replyInput.value.trim();
+            if (!value) return;
+
+            const reply = document.createElement('div');
+            reply.className = 'reply';
+            reply.innerHTML = `
+              <small>Anonymous • ${timeStamp()}</small>
+              <div>${value.replace(/\n/g, '<br>')}</div>
+            `;
+
+            replies.appendChild(reply);
+            replyInput.value = '';
+          });
+
+          threadsEl.prepend(thread);
+        }
+
+        document.getElementById('postThread').addEventListener('click', () => {
+          const title = document.getElementById('threadTitle').value.trim();
+          const text = document.getElementById('threadText').value.trim();
+          const file = document.getElementById('threadImage').files[0];
+
+          if (!title || !text) return;
+
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = e => createThread(title, text, e.target.result);
+            reader.readAsDataURL(file);
+          } else {
+            createThread(title, text, '');
+          }
+
+          document.getElementById('threadTitle').value = '';
+          document.getElementById('threadText').value = '';
+          document.getElementById('threadImage').value = '';
+        });
+
+        createThread(
+          'Welcome to the community board',
+          'Use this space for organizing, resources, event planning, and respectful discussion.',
+          ''
+        );
+      </script>
     </main>
   </body>
 </html>
