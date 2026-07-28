@@ -81,7 +81,7 @@
 
   function handleDecline() {
     window.localStorage.removeItem(ACCESS_KEY);
-    window.location.href = 'https://example.com';
+    window.location.href = '/';
   }
 
   document.addEventListener('DOMContentLoaded', () => {
