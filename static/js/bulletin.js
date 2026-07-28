@@ -27,7 +27,10 @@
     h4.textContent = sender;
 
     const p = document.createElement('p');
-    p.textContent = text;
+    text.split('\n').forEach((line, i) => {
+      if (i > 0) p.appendChild(document.createElement('br'));
+      p.appendChild(document.createTextNode(line));
+    });
 
     const small = document.createElement('small');
     small.textContent = timeStamp();
@@ -85,7 +88,10 @@
     }
 
     const p = document.createElement('p');
-    p.textContent = text;
+    text.split('\n').forEach((line, i) => {
+      if (i > 0) p.appendChild(document.createElement('br'));
+      p.appendChild(document.createTextNode(line));
+    });
     body.appendChild(p);
 
     const repliesEl = document.createElement('div');
@@ -128,7 +134,10 @@
       small.textContent = `Anonymous • ${timeStamp()}`;
 
       const content = document.createElement('div');
-      content.textContent = value;
+      value.split('\n').forEach((line, i) => {
+        if (i > 0) content.appendChild(document.createElement('br'));
+        content.appendChild(document.createTextNode(line));
+      });
 
       reply.appendChild(small);
       reply.appendChild(content);
