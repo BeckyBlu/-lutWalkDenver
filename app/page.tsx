@@ -37,20 +37,53 @@ export default function HomePage() {
     setMessage('Incorrect password. Please try again or contact an organizer.');
   };
 
-  return (
-    <main className="shell">
-      <header className="hero">
-        <nav>
-          <div className="logo">$lutWalk Denver</div>
+  const handleDecline = () => {
+    window.localStorage.removeItem('slutwalk-access');
+    window.location.href = 'https://example.com';
+  };
 
-          <ul>
-            <li><Link href="/about">About</Link></li>
-            <li><Link href="/shop">Store</Link></li>
-            <li><Link href="/bulletin">Bulletin</Link></li>
-            <li><Link href="/calendar">Calendar</Link></li>
-            <li><Link href="/admin-login">Admin</Link></li>
-          </ul>
-        </nav>
+  return (
+    <>
+      {!unlocked && (
+        <div id="gateModal" className="gate-modal">
+          <div className="gate-card">
+            <h1>$lutWalk Denver</h1>
+            <p className="subtitle">Community Member Access</p>
+
+            <form className="gate-form gate-modal-form" onSubmit={handleSubmit}>
+              <input
+                type="password"
+                id="password"
+                placeholder="Enter Password"
+                value={gateModel.password}
+                onChange={(event) => setGateModel({ ...gateModel, password: event.target.value })}
+              />
+              <div className="gate-modal-buttons">
+                <button id="loginBtn" type="submit">Enter Community</button>
+                <button type="button" id="declineBtn" className="decline-btn" onClick={handleDecline}>
+                  Leave
+                </button>
+              </div>
+              <p id="errorMessage" className="helper">{message}</p>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <div id="siteContent" style={{ display: unlocked ? 'block' : 'none' }}>
+        <main className="shell">
+          <header className="hero">
+            <nav>
+              <div className="logo">$lutWalk Denver</div>
+
+              <ul>
+                <li><Link href="/about">About</Link></li>
+                <li><Link href="/shop">Store</Link></li>
+                <li><Link href="/bulletin">Bulletin</Link></li>
+                <li><Link href="/calendar">Calendar</Link></li>
+                <li><Link href="/admin-login">Admin</Link></li>
+              </ul>
+            </nav>
 
         <div className="hero-overlay">
           <p className="eyebrow">Community hub</p>
@@ -67,26 +100,6 @@ export default function HomePage() {
           </div>
         </div>
       </header>
-
-      <section id="login" className="login-card">
-        <p className="eyebrow">Members only</p>
-        <h2>Enter the shared community password</h2>
-        <form className="gate-form" onSubmit={handleSubmit}>
-          <label htmlFor="password">Access password</label>
-          <div className="form-row">
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={gateModel.password}
-              placeholder="Enter access password"
-              onChange={(event) => setGateModel({ ...gateModel, password: event.target.value })}
-            />
-            <button type="submit">Enter community</button>
-          </div>
-          <p className="helper">{message}</p>
-        </form>
-      </section>
 
       <section className="featured">
         <p className="eyebrow">Public landing page</p>
@@ -228,5 +241,7 @@ export default function HomePage() {
         </section>
       </section>
     </main>
+  </div>
+</>
   );
 }
