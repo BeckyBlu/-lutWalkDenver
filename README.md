@@ -41,6 +41,7 @@ The site now includes:
 ### Next.js app
 
 - [app/page.tsx](app/page.tsx) renders the same experience in React.
+- [app/bulletin/page.tsx](app/bulletin/page.tsx) provides the bulletin board with chat and thread interaction.
 - [app/layout.tsx](app/layout.tsx) defines the metadata and root document shell.
 - [app/globals.css](app/globals.css) contains the app-wide base styles and shared design tokens.
 - The access state is persisted in localStorage under slutwalk-access.
