@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { verifyTokenEdge } from './lib/auth-edge';
 
 const PROTECTED_PATHS = [
   '/archive',
@@ -11,13 +12,13 @@ const PROTECTED_PATHS = [
   '/zines',
 ];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (PROTECTED_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
     const token = request.cookies.get('sw_auth')?.value;
 
-    if (!token) {
+    if (!token || !(await verifyTokenEdge(token))) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = '/';
       return NextResponse.redirect(redirectUrl);
