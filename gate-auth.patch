@@ -1,0 +1,505 @@
+diff --git a/app/api/auth/login/route.ts b/app/api/auth/login/route.ts
+new file mode 100644
+index 0000000..ca1e753
+--- /dev/null
++++ b/app/api/auth/login/route.ts
+@@ -0,0 +1,31 @@
++import { NextResponse } from 'next/server';
++
++import { signToken } from '../../../../lib/auth';
++
++export async function POST(request: Request) {
++  try {
++    const { password } = await request.json();
++    const memberPassword = process.env.MEMBER_PASSWORD;
++
++    if (!memberPassword || password !== memberPassword) {
++      return NextResponse.json({ ok: false, message: 'Unauthorized' }, { status: 401 });
++    }
++
++    const token = signToken({ sub: 'member' });
++    const response = NextResponse.json({ ok: true });
++
++    response.cookies.set({
++      name: 'sw_auth',
++      value: token,
++      httpOnly: true,
++      path: '/',
++      sameSite: 'lax',
++      secure: process.env.NODE_ENV === 'production',
++      maxAge: 60 * 60 * 24 * 30,
++    });
++
++    return response;
++  } catch {
++    return NextResponse.json({ ok: false }, { status: 500 });
++  }
++}
+\ No newline at end of file
+diff --git a/app/api/auth/logout/route.ts b/app/api/auth/logout/route.ts
+new file mode 100644
+index 0000000..1727802
+--- /dev/null
++++ b/app/api/auth/logout/route.ts
+@@ -0,0 +1,15 @@
++import { NextResponse } from 'next/server';
++
++export async function POST() {
++  const response = NextResponse.json({ ok: true });
++
++  response.cookies.set({
++    name: 'sw_auth',
++    value: '',
++    httpOnly: true,
++    path: '/',
++    maxAge: 0,
++  });
++
++  return response;
++}
+\ No newline at end of file
+diff --git a/app/page.tsx b/app/page.tsx
+index 4457e86..619b30a 100644
+--- a/app/page.tsx
++++ b/app/page.tsx
+@@ -6,7 +6,7 @@ import type { FormEvent } from 'react';
+ import type { GateModel } from './gate-model';
+ import { initialGateModel } from './gate-model';
+ 
+-const ACCESS_PASSWORD = 'GurlGang2030!';
++const ACCESS_KEY = 'slutwalk-access';
+ 
+ export default function HomePage() {
+   const [gateModel, setGateModel] = useState<GateModel>(initialGateModel);
+@@ -14,31 +14,48 @@ export default function HomePage() {
+   const [message, setMessage] = useState('Members enter the shared password to unlock the dashboard.');
+ 
+   useEffect(() => {
+-    const isUnlocked = window.localStorage.getItem('slutwalk-access') === 'true';
++    const isUnlocked = window.localStorage.getItem(ACCESS_KEY) === 'true';
+     setUnlocked(isUnlocked);
+     if (isUnlocked) {
+       setMessage('Welcome back. Your member dashboard is ready.');
+     }
+   }, []);
+ 
+-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
++  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+     event.preventDefault();
+ 
+-    if (gateModel.password === ACCESS_PASSWORD) {
+-      window.localStorage.setItem('slutwalk-access', 'true');
++    const response = await fetch('/api/auth/login', {
++      method: 'POST',
++      headers: { 'Content-Type': 'application/json' },
++      credentials: 'include',
++      body: JSON.stringify({ password: gateModel.password }),
++    });
++
++    if (response.ok) {
++      window.localStorage.setItem(ACCESS_KEY, 'true');
+       setUnlocked(true);
+       setGateModel(initialGateModel);
+       setMessage('Welcome back. Your member dashboard is ready.');
+       return;
+     }
+ 
+-    window.localStorage.removeItem('slutwalk-access');
++    window.localStorage.removeItem(ACCESS_KEY);
+     setUnlocked(false);
+     setMessage('Incorrect password. Please try again or contact an organizer.');
+   };
+ 
++  const handleLogout = async () => {
++    await fetch('/api/auth/logout', {
++      method: 'POST',
++      credentials: 'include',
++    });
++
++    window.localStorage.removeItem(ACCESS_KEY);
++    setUnlocked(false);
++  };
++
+   const handleDecline = () => {
+-    window.localStorage.removeItem('slutwalk-access');
++    window.localStorage.removeItem(ACCESS_KEY);
+     window.location.href = 'https://example.com';
+   };
+ 
+@@ -97,6 +114,9 @@ export default function HomePage() {
+           <div className="btn-row">
+             <a className="btn" href="#login">Unlock member space</a>
+             <Link className="btn btn-secondary" href="/admin-login">Administrator portal</Link>
++            <button className="btn btn-secondary" type="button" onClick={() => void handleLogout()}>
++              Sign out
++            </button>
+           </div>
+         </div>
+       </header>
+diff --git a/index.html b/index.html
+index 1776f62..f34476a 100644
+--- a/index.html
++++ b/index.html
+@@ -8,101 +8,8 @@
+     <link rel="stylesheet" href="styles.css" />
+   </head>
+   <body>
+-    <script>
+-      const ACCESS_PASSWORD = 'GurlGang2030!';
+-      const ACCESS_KEY = 'slutwalk-access';
+-
+-      function setUnlockedState(isUnlocked) {
+-        const content = document.querySelector('.content');
+-        const form = document.querySelector('.gate-form');
+-        const button = document.querySelector('.gate-form button[type="submit"]');
+-        const input = document.querySelector('.gate-form input');
+-
+-        if (content) {
+-          content.classList.toggle('content--locked', !isUnlocked);
+-          content.classList.toggle('content--open', isUnlocked);
+-        }
+-
+-        if (form && input && button) {
+-          input.disabled = isUnlocked;
+-          button.disabled = isUnlocked;
+-          button.textContent = isUnlocked ? 'Unlocked' : 'Enter community';
+-        }
+-      }
+-
+-      function handleSubmit(event) {
+-        event.preventDefault();
+-        const input = document.querySelector('.gate-form input');
+-        if (!input) return;
+-
+-        if (input.value === ACCESS_PASSWORD) {
+-          window.localStorage.setItem(ACCESS_KEY, 'true');
+-          setUnlockedState(true);
+-          input.value = '';
+-          return;
+-        }
+-
+-        window.localStorage.removeItem(ACCESS_KEY);
+-        setUnlockedState(false);
+-      }
+-
+-      function handleDecline() {
+-        window.localStorage.removeItem(ACCESS_KEY);
+-        window.location.href = 'https://example.com';
+-      }
+-
+-      document.addEventListener('DOMContentLoaded', () => {
+-        const form = document.querySelector('.gate-form');
+-        const declineBtn = document.getElementById('declineBtn');
+-        if (form) {
+-          form.addEventListener('submit', handleSubmit);
+-        }
+-        if (declineBtn) {
+-          declineBtn.addEventListener('click', handleDecline);
+-        }
+-
+-        const isUnlocked = window.localStorage.getItem(ACCESS_KEY) === 'true';
+-        setUnlockedState(isUnlocked);
+-      });
+-
+-        if (content) {
+-          content.classList.toggle('content--locked', !isUnlocked);
+-          content.classList.toggle('content--open', isUnlocked);
+-        }
+-
+-        if (form && input && button) {
+-          input.disabled = isUnlocked;
+-          button.disabled = isUnlocked;
+-          button.textContent = isUnlocked ? 'Unlocked' : 'Enter community';
+-        }
+-      }
+-
+-      function handleSubmit(event) {
+-        event.preventDefault();
+-        const input = document.querySelector('.gate-form input');
+-        if (!input) return;
+-
+-        if (input.value === ACCESS_PASSWORD) {
+-          window.localStorage.setItem(ACCESS_KEY, 'true');
+-          setUnlockedState(true);
+-          input.value = '';
+-          return;
+-        }
+-
+-        window.localStorage.removeItem(ACCESS_KEY);
+-        setUnlockedState(false);
+-      }
+-
+-      document.addEventListener('DOMContentLoaded', () => {
+-        const form = document.querySelector('.gate-form');
+-        if (form) {
+-          form.addEventListener('submit', handleSubmit);
+-        }
+-
+-        const isUnlocked = window.localStorage.getItem(ACCESS_KEY) === 'true';
+-        setUnlockedState(isUnlocked);
+-      });
+-    </script>
++    <script>window.SW_AUTH_ENDPOINT = '/api/auth/login';</script>
++    <script src="/static/js/gate.js" defer></script>
+ 
+     <main class="shell">
+       <header class="hero">
+diff --git a/lib/auth.ts b/lib/auth.ts
+new file mode 100644
+index 0000000..ef1442a
+--- /dev/null
++++ b/lib/auth.ts
+@@ -0,0 +1,50 @@
++import crypto from 'crypto';
++
++const AUTH_SECRET = process.env.AUTH_SECRET ?? '';
++
++function base64url(input: string | Buffer) {
++  return Buffer.from(input).toString('base64url');
++}
++
++export function signToken(payload: Record<string, unknown>) {
++  if (!AUTH_SECRET) {
++    throw new Error('AUTH_SECRET is not configured');
++  }
++
++  const header = { alg: 'HS256', typ: 'JWT' };
++  const iat = Math.floor(Date.now() / 1000);
++  const body = { ...payload, iat };
++  const encoded = `${base64url(JSON.stringify(header))}.${base64url(JSON.stringify(body))}`;
++  const signature = crypto.createHmac('sha256', AUTH_SECRET).update(encoded).digest('base64url');
++
++  return `${encoded}.${signature}`;
++}
++
++export function verifyToken(token: string) {
++  if (!token || !AUTH_SECRET) {
++    return null;
++  }
++
++  try {
++    const [encodedHeader, encodedBody, signature] = token.split('.');
++
++    if (!encodedHeader || !encodedBody || !signature) {
++      return null;
++    }
++
++    const unsigned = `${encodedHeader}.${encodedBody}`;
++    const expectedSignature = crypto.createHmac('sha256', AUTH_SECRET).update(unsigned).digest('base64url');
++
++    if (signature.length !== expectedSignature.length) {
++      return null;
++    }
++
++    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
++      return null;
++    }
++
++    return JSON.parse(Buffer.from(encodedBody, 'base64url').toString('utf8'));
++  } catch {
++    return null;
++  }
++}
+\ No newline at end of file
+diff --git a/middleware.ts b/middleware.ts
+new file mode 100644
+index 0000000..f3b47e1
+--- /dev/null
++++ b/middleware.ts
+@@ -0,0 +1,24 @@
++import { NextResponse } from 'next/server';
++import type { NextRequest } from 'next/server';
++
++const PROTECTED_PATHS = ['/about', '/bulletin', '/calendar', '/community', '/events', '/shop', '/zines'];
++
++export function middleware(request: NextRequest) {
++  const { pathname } = request.nextUrl;
++
++  if (PROTECTED_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
++    const token = request.cookies.get('sw_auth')?.value;
++
++    if (!token) {
++      const redirectUrl = request.nextUrl.clone();
++      redirectUrl.pathname = '/';
++      return NextResponse.redirect(redirectUrl);
++    }
++  }
++
++  return NextResponse.next();
++}
++
++export const config = {
++  matcher: ['/about/:path*', '/bulletin/:path*', '/calendar/:path*', '/community/:path*', '/events/:path*', '/shop/:path*', '/zines/:path*'],
++};
+\ No newline at end of file
+diff --git a/netlify/functions/login.js b/netlify/functions/login.js
+new file mode 100644
+index 0000000..9979da4
+--- /dev/null
++++ b/netlify/functions/login.js
+@@ -0,0 +1,45 @@
++const crypto = require('crypto');
++
++const MEMBER_PASSWORD = process.env.MEMBER_PASSWORD || '';
++const AUTH_SECRET = process.env.AUTH_SECRET || '';
++
++function base64url(input) {
++  return Buffer.from(input).toString('base64url');
++}
++
++function signToken(payload) {
++  if (!AUTH_SECRET) {
++    throw new Error('AUTH_SECRET is not configured');
++  }
++
++  const header = { alg: 'HS256', typ: 'JWT' };
++  const iat = Math.floor(Date.now() / 1000);
++  const body = { ...payload, iat };
++  const encoded = `${base64url(JSON.stringify(header))}.${base64url(JSON.stringify(body))}`;
++  const signature = crypto.createHmac('sha256', AUTH_SECRET).update(encoded).digest('base64url');
++
++  return `${encoded}.${signature}`;
++}
++
++exports.handler = async function handler(event) {
++  if (event.httpMethod !== 'POST') {
++    return { statusCode: 405, body: JSON.stringify({ ok: false }) };
++  }
++
++  const { password } = JSON.parse(event.body || '{}');
++
++  if (!password || password !== MEMBER_PASSWORD) {
++    return { statusCode: 401, body: JSON.stringify({ ok: false }) };
++  }
++
++  const token = signToken({ sub: 'member' });
++
++  return {
++    statusCode: 200,
++    headers: {
++      'Set-Cookie': `sw_auth=${token}; HttpOnly; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax`,
++      'Content-Type': 'application/json',
++    },
++    body: JSON.stringify({ ok: true }),
++  };
++};
+\ No newline at end of file
+diff --git a/netlify/functions/logout.js b/netlify/functions/logout.js
+new file mode 100644
+index 0000000..ad709cc
+--- /dev/null
++++ b/netlify/functions/logout.js
+@@ -0,0 +1,10 @@
++exports.handler = async function handler() {
++  return {
++    statusCode: 200,
++    headers: {
++      'Set-Cookie': 'sw_auth=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax',
++      'Content-Type': 'application/json',
++    },
++    body: JSON.stringify({ ok: true }),
++  };
++};
+\ No newline at end of file
+diff --git a/static/js/gate.js b/static/js/gate.js
+new file mode 100644
+index 0000000..1366a34
+--- /dev/null
++++ b/static/js/gate.js
+@@ -0,0 +1,95 @@
++(() => {
++  const ACCESS_KEY = 'slutwalk-access';
++  const authEndpoint = typeof window.SW_AUTH_ENDPOINT === 'string' ? window.SW_AUTH_ENDPOINT : '';
++  const fallbackPassword = typeof window.SW_FALLBACK_PASSWORD === 'string' ? window.SW_FALLBACK_PASSWORD : '';
++
++  function setUnlockedState(isUnlocked) {
++    const content = document.querySelector('.content');
++    const form = document.querySelector('.gate-form');
++    const submitButton = form ? form.querySelector('button[type="submit"]') : null;
++    const input = form ? form.querySelector('input[name="password"], input[type="password"]') : null;
++
++    if (content) {
++      content.classList.toggle('content--locked', !isUnlocked);
++      content.classList.toggle('content--open', isUnlocked);
++    }
++
++    if (input) {
++      input.disabled = isUnlocked;
++    }
++
++    if (submitButton) {
++      submitButton.disabled = isUnlocked;
++      submitButton.textContent = isUnlocked ? 'Unlocked' : 'Enter community';
++    }
++  }
++
++  async function tryServerLogin(password) {
++    if (!authEndpoint) {
++      return null;
++    }
++
++    try {
++      const response = await fetch(authEndpoint, {
++        method: 'POST',
++        headers: { 'Content-Type': 'application/json' },
++        credentials: 'include',
++        body: JSON.stringify({ password }),
++      });
++
++      return response.ok;
++    } catch (error) {
++      console.error('gate login error', error);
++      return false;
++    }
++  }
++
++  async function handleSubmit(event) {
++    event.preventDefault();
++
++    const input = document.querySelector('.gate-form input[name="password"], .gate-form input[type="password"]');
++    if (!input) {
++      return;
++    }
++
++    const password = input.value || '';
++    const serverResult = await tryServerLogin(password);
++
++    if (serverResult === true) {
++      window.localStorage.setItem(ACCESS_KEY, 'true');
++      setUnlockedState(true);
++      input.value = '';
++      return;
++    }
++
++    if (fallbackPassword && password === fallbackPassword) {
++      window.localStorage.setItem(ACCESS_KEY, 'true');
++      setUnlockedState(true);
++      input.value = '';
++      return;
++    }
++
++    window.localStorage.removeItem(ACCESS_KEY);
++    setUnlockedState(false);
++  }
++
++  function handleDecline() {
++    window.localStorage.removeItem(ACCESS_KEY);
++    window.location.href = 'https://example.com';
++  }
++
++  document.addEventListener('DOMContentLoaded', () => {
++    const form = document.querySelector('.gate-form');
++    const declineBtn = document.getElementById('declineBtn');
++
++    if (form) {
++      form.addEventListener('submit', handleSubmit);
++    }
++
++    if (declineBtn) {
++      declineBtn.addEventListener('click', handleDecline);
++    }
++
++    setUnlockedState(window.localStorage.getItem(ACCESS_KEY) === 'true');
++  });
++})();
+\ No newline at end of file

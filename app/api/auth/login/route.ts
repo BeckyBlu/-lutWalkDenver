@@ -1,0 +1,31 @@
+import { NextResponse } from 'next/server';
+
+import { signToken } from '../../../../lib/auth';
+
+export async function POST(request: Request) {
+  try {
+    const { password } = await request.json();
+    const memberPassword = process.env.MEMBER_PASSWORD;
+
+    if (!memberPassword || password !== memberPassword) {
+      return NextResponse.json({ ok: false, message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const token = signToken({ sub: 'member' });
+    const response = NextResponse.json({ ok: true });
+
+    response.cookies.set({
+      name: 'sw_auth',
+      value: token,
+      httpOnly: true,
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 30,
+    });
+
+    return response;
+  } catch {
+    return NextResponse.json({ ok: false }, { status: 500 });
+  }
+}

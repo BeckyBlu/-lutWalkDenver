@@ -6,7 +6,7 @@ import type { FormEvent } from 'react';
 import type { GateModel } from './gate-model';
 import { initialGateModel } from './gate-model';
 
-const ACCESS_PASSWORD = 'GurlGang2030!';
+const ACCESS_KEY = 'slutwalk-access';
 
 export default function HomePage() {
   const [gateModel, setGateModel] = useState<GateModel>(initialGateModel);
@@ -14,31 +14,48 @@ export default function HomePage() {
   const [message, setMessage] = useState('Members enter the shared password to unlock the dashboard.');
 
   useEffect(() => {
-    const isUnlocked = window.localStorage.getItem('slutwalk-access') === 'true';
+    const isUnlocked = window.localStorage.getItem(ACCESS_KEY) === 'true';
     setUnlocked(isUnlocked);
     if (isUnlocked) {
       setMessage('Welcome back. Your member dashboard is ready.');
     }
   }, []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (gateModel.password === ACCESS_PASSWORD) {
-      window.localStorage.setItem('slutwalk-access', 'true');
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ password: gateModel.password }),
+    });
+
+    if (response.ok) {
+      window.localStorage.setItem(ACCESS_KEY, 'true');
       setUnlocked(true);
       setGateModel(initialGateModel);
       setMessage('Welcome back. Your member dashboard is ready.');
       return;
     }
 
-    window.localStorage.removeItem('slutwalk-access');
+    window.localStorage.removeItem(ACCESS_KEY);
     setUnlocked(false);
     setMessage('Incorrect password. Please try again or contact an organizer.');
   };
 
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    window.localStorage.removeItem(ACCESS_KEY);
+    setUnlocked(false);
+  };
+
   const handleDecline = () => {
-    window.localStorage.removeItem('slutwalk-access');
+    window.localStorage.removeItem(ACCESS_KEY);
     window.location.href = 'https://example.com';
   };
 
@@ -97,6 +114,9 @@ export default function HomePage() {
           <div className="btn-row">
             <a className="btn" href="#login">Unlock member space</a>
             <Link className="btn btn-secondary" href="/admin-login">Administrator portal</Link>
+            <button className="btn btn-secondary" type="button" onClick={() => void handleLogout()}>
+              Sign out
+            </button>
           </div>
         </div>
       </header>
