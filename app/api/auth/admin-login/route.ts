@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { signToken } from '../../../../lib/auth';
+import { getAdminPassword } from '../../../../lib/passwords';
 
 const ADMIN_TOKEN_MAX_AGE = 60 * 60 * 8; // 8 hours
 
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
 
   try {
     const { password } = await request.json();
-    const adminPassword = process.env.ADMIN_PASSWORD;
+    const adminPassword = getAdminPassword();
 
     if (!adminPassword || password !== adminPassword) {
       return NextResponse.json({ ok: false, message: 'Unauthorized' }, { status: 401 });

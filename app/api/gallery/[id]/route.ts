@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { getAdminDb } from '../../../../lib/firebase-admin';
-import { verifyToken } from '../../../../lib/auth';
+import { requireAdmin } from '../../../../lib/authz';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function DELETE(_request: Request, context: RouteContext) {
-  const cookieStore = await cookies();
-  const adminToken = cookieStore.get('sw_admin')?.value;
-  if (!adminToken || !verifyToken(adminToken)) {
+  if (!(await requireAdmin())) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

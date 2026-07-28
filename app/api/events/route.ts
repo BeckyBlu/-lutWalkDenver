@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '../../../lib/firebase-admin';
-import { verifyToken } from '../../../lib/auth';
-import { cookies } from 'next/headers';
+import { requireAdmin, requireMemberOrAdmin } from '../../../lib/authz';
 import { FieldValue } from 'firebase-admin/firestore';
 
 export async function GET(request: Request) {
+  if (!(await requireMemberOrAdmin())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const limitParam = Number(searchParams.get('limit') ?? '50');
   const limit = Math.min(Math.max(1, limitParam), 100);
@@ -26,9 +29,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const cookieStore = await cookies();
-  const adminToken = cookieStore.get('sw_admin')?.value;
-  if (!adminToken || !verifyToken(adminToken)) {
+  if (!(await requireAdmin())) {
     return NextResponse.json({ error: 'Forbidden — admin access required' }, { status: 403 });
   }
 

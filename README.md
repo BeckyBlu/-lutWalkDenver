@@ -95,8 +95,8 @@ npm run dev
 Copy `.env.example` to `.env.local` and set values for:
 
 - `AUTH_SECRET`
-- `MEMBER_PASSWORD`
-- `ADMIN_PASSWORD`
+- `MEMBER_PASSWORD` for the shared community-member password. Legacy deployment keys `SW_AUTH`, `sw_auth`, `SW__AUTH`, and `sw__auth` are also accepted for compatibility, but `MEMBER_PASSWORD` is preferred.
+- `ADMIN_PASSWORD` for administrator access. Legacy deployment keys `SW_ADMIN` and `sw_admin` are also accepted for compatibility, but `ADMIN_PASSWORD` is preferred.
 - Firebase Admin SDK credentials
 - Firebase client SDK values
 

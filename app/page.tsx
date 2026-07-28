@@ -14,11 +14,28 @@ export default function HomePage() {
   const [message, setMessage] = useState('Members enter the shared password to unlock the dashboard.');
 
   useEffect(() => {
-    const isUnlocked = window.localStorage.getItem(ACCESS_KEY) === 'true';
-    setUnlocked(isUnlocked);
-    if (isUnlocked) {
-      setMessage('Welcome back. Your member dashboard is ready.');
+    let active = true;
+
+    async function syncSession() {
+      try {
+        const response = await fetch('/api/auth/session', { credentials: 'include' });
+        const data = await response.json() as { role?: 'member' | 'admin' | null };
+        const isUnlocked = data.role === 'member' || data.role === 'admin';
+
+        if (!active) return;
+        setUnlocked(isUnlocked);
+        window.localStorage.setItem(ACCESS_KEY, String(isUnlocked));
+        setMessage(isUnlocked ? 'Welcome back. Your member dashboard is ready.' : 'Members enter the shared password to unlock the dashboard.');
+      } catch {
+        if (!active) return;
+        window.localStorage.removeItem(ACCESS_KEY);
+        setUnlocked(false);
+      }
     }
+
+    void syncSession();
+
+    return () => { active = false; };
   }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -112,7 +129,7 @@ export default function HomePage() {
           </p>
 
           <div className="btn-row">
-            <a className="btn" href="#login">Unlock member space</a>
+            <Link className="btn" href="/about">Enter member space</Link>
             <Link className="btn btn-secondary" href="/admin-login">Administrator portal</Link>
             <button className="btn btn-secondary" type="button" onClick={() => void handleLogout()}>
               Sign out
@@ -135,7 +152,7 @@ export default function HomePage() {
           </article>
           <article>
             <h3>Privacy notice</h3>
-            <p>Member access is stored locally in the browser for this prototype and can be cleared at any time.</p>
+            <p>Member access is enforced with secure, httpOnly session cookies and can be cleared at any time.</p>
           </article>
         </div>
       </section>
