@@ -83,3 +83,7 @@ Copy `.env.example` to `.env.local` and set values for:
 - `ADMIN_PASSWORD`
 - Firebase Admin SDK credentials
 - Firebase client SDK values
+
+## Architecture planning
+
+- See [Architecture Alignment Plan](docs/architecture-alignment-plan.md) for the route, data-flow, and phased implementation plan that aligns the current Next.js prototype with the requested community hub architecture.
