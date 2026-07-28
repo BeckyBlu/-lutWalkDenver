@@ -6,7 +6,7 @@
   --text: #f5efe8;
   --muted: #d5c7ba;
   --accent: #ff5c7a;
-  --accent-2: #f5b700;
+  --accent-2: hwb(344 0% 4%);
   --line: rgba(255, 248, 240, 0.16);
 }
 
