@@ -1,19 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '../../../lib/firebase-admin';
-import { verifyToken } from '../../../lib/auth';
-import { cookies } from 'next/headers';
+import { requireMemberOrAdmin } from '../../../lib/authz';
 import { FieldValue } from 'firebase-admin/firestore';
 
-function isAuthorized(memberToken?: string, adminToken?: string) {
-  return (
-    (memberToken && verifyToken(memberToken)) ||
-    (adminToken && verifyToken(adminToken))
-  );
-}
 
 export async function GET(request: Request) {
-  const cookieStore = await cookies();
-  if (!isAuthorized(cookieStore.get('sw_auth')?.value, cookieStore.get('sw_admin')?.value)) {
+  if (!(await requireMemberOrAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -52,8 +44,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const cookieStore = await cookies();
-  if (!isAuthorized(cookieStore.get('sw_auth')?.value, cookieStore.get('sw_admin')?.value)) {
+  if (!(await requireMemberOrAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '../../../../lib/firebase-admin';
-import { verifyToken } from '../../../../lib/auth';
-import { cookies } from 'next/headers';
+import { requireAdmin } from '../../../../lib/authz';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function DELETE(_request: Request, context: RouteContext) {
-  const cookieStore = await cookies();
-  const adminToken = cookieStore.get('sw_admin')?.value;
-  if (!adminToken || !verifyToken(adminToken)) {
+  if (!(await requireAdmin())) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -24,9 +21,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const cookieStore = await cookies();
-  const adminToken = cookieStore.get('sw_admin')?.value;
-  if (!adminToken || !verifyToken(adminToken)) {
+  if (!(await requireAdmin())) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
