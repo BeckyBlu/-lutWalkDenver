@@ -1,8 +1,8 @@
 const crypto = require('crypto');
 
-const MEMBER_PASSWORD = process.env.MEMBER_PASSWORD || '';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const AUTH_SECRET = process.env.AUTH_SECRET || '';
-const TOKEN_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
+const ADMIN_TOKEN_MAX_AGE = 60 * 60 * 8; // 8 hours
 
 function base64url(input) {
   return Buffer.from(input).toString('base64url');
@@ -15,7 +15,7 @@ function signToken(payload) {
 
   const header = { alg: 'HS256', typ: 'JWT' };
   const iat = Math.floor(Date.now() / 1000);
-  const exp = iat + TOKEN_TTL_SECONDS;
+  const exp = iat + ADMIN_TOKEN_MAX_AGE;
   const body = { ...payload, iat, exp };
   const encoded = `${base64url(JSON.stringify(header))}.${base64url(JSON.stringify(body))}`;
   const signature = crypto.createHmac('sha256', AUTH_SECRET).update(encoded).digest('base64url');
@@ -41,16 +41,16 @@ exports.handler = async function handler(event) {
 
   const { password } = JSON.parse(event.body || '{}');
 
-  if (!password || password !== MEMBER_PASSWORD) {
+  if (!ADMIN_PASSWORD || !password || password !== ADMIN_PASSWORD) {
     return { statusCode: 401, body: JSON.stringify({ ok: false }) };
   }
 
-  const token = signToken({ sub: 'member' });
+  const token = signToken({ sub: 'admin' });
 
   return {
     statusCode: 200,
     headers: {
-      'Set-Cookie': `sw_auth=${token}; HttpOnly; Path=/; Max-Age=${TOKEN_TTL_SECONDS}; SameSite=Lax; Secure`,
+      'Set-Cookie': `sw_admin=${token}; HttpOnly; Path=/; Max-Age=${ADMIN_TOKEN_MAX_AGE}; SameSite=Lax; Secure`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ ok: true }),

@@ -6,7 +6,6 @@ import type { FormEvent } from 'react';
 import type { GateModel } from '../gate-model';
 import { initialGateModel } from '../gate-model';
 
-const ADMIN_PASSWORD = 'Organizer2026!';
 const ADMIN_ACCESS_KEY = 'slutwalk-admin-access';
 
 export default function AdminLoginPage() {
@@ -26,22 +25,36 @@ export default function AdminLoginPage() {
     }
   }, []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (gateModel.password === ADMIN_PASSWORD) {
+    const response = await fetch('/api/auth/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ password: gateModel.password }),
+    });
+
+    if (response.ok) {
       window.localStorage.setItem(ADMIN_ACCESS_KEY, 'true');
       setUnlocked(true);
+      setGateModel(initialGateModel);
       setMessage('Administrator access unlocked.');
       return;
     }
 
     window.localStorage.removeItem(ADMIN_ACCESS_KEY);
     setUnlocked(false);
+    setGateModel(initialGateModel);
     setMessage('Incorrect administrator password.');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await fetch('/api/auth/admin-logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+
     window.localStorage.removeItem(ADMIN_ACCESS_KEY);
     setUnlocked(false);
     setGateModel(initialGateModel);
@@ -70,7 +83,7 @@ export default function AdminLoginPage() {
 
       <section className="login-card">
         <h2>Administrator login</h2>
-        <form className="gate-form" onSubmit={handleSubmit}>
+        <form className="gate-form" onSubmit={(e) => void handleSubmit(e)}>
           <label htmlFor="admin-password">Administrator password</label>
           <div className="form-row">
             <input
@@ -89,7 +102,7 @@ export default function AdminLoginPage() {
 
       <section className={`content ${unlocked ? 'content--open' : 'content--locked'}`}>
         <div className="btn-row" style={{ justifyContent: 'flex-start' }}>
-          <button className="btn btn-secondary" type="button" onClick={handleLogout}>
+          <button className="btn btn-secondary" type="button" onClick={() => void handleLogout()}>
             Lock admin session
           </button>
         </div>
@@ -141,3 +154,4 @@ export default function AdminLoginPage() {
     </main>
   );
 }
+

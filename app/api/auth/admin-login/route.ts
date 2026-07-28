@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 
 import { signToken } from '../../../../lib/auth';
 
+const ADMIN_TOKEN_MAX_AGE = 60 * 60 * 8; // 8 hours
+
 export async function POST(request: Request) {
   // CSRF: reject cross-origin requests that supply an Origin header
   const origin = request.headers.get('origin');
@@ -14,23 +16,23 @@ export async function POST(request: Request) {
 
   try {
     const { password } = await request.json();
-    const memberPassword = process.env.MEMBER_PASSWORD;
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
-    if (!memberPassword || password !== memberPassword) {
+    if (!adminPassword || password !== adminPassword) {
       return NextResponse.json({ ok: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const token = signToken({ sub: 'member' });
+    const token = signToken({ sub: 'admin' });
     const response = NextResponse.json({ ok: true });
 
     response.cookies.set({
-      name: 'sw_auth',
+      name: 'sw_admin',
       value: token,
       httpOnly: true,
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 30,
+      maxAge: ADMIN_TOKEN_MAX_AGE,
     });
 
     return response;
