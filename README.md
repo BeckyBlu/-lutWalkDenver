@@ -1,55 +1,53 @@
 
-
 ## Overview
 
-This repository contains two aligned implementations of the same SlutWalk Denver site:
+This repository contains two aligned implementations of the same SlutWalk Denver experience:
 
-- A static site at the repository root for GitHub Pages
-- A Next.js app router version under `app/`
+- A static landing page at the repository root for GitHub Pages
+- A Next.js app-router version under app/
 
-Both versions use the same structure, copy, and visual language so the deployed Pages site and the Next starter stay in sync.
+Both versions share the same structure, copy, and visual language so the published Pages site and the React version stay in sync.
 
 ## Experience
 
-The page includes:
+The site now includes:
 
 - A full-screen hero for SlutWalk Denver
-- A shared-password member gate
-- A featured campaign or announcement block
-- A compact movement timeline with the years 2011, 2020, 2021, and 2022
-- Zine, event, community-board, and archive sections
+- A member access gate for the private community space
+- A featured campaign section centered on the next organizing circle
+- A movement timeline with the years 2011, 2020, 2021, and 2022
+- Zine spotlights, event listings, a community bulletin board, a member chatroom, and archive sections
 
-## Password
+## Access
 
-- Demo password: `GurlGang2030!`
+- Members enter through a shared access password defined in the static page and the React page.
+- A successful entry stores access in browser storage so the protected content remains available on return visits.
 
 ## Content Notes
 
-- The site centers survivor-led organizing, digital archives, community education, and feminist media.
+- The experience centers survivor-led organizing, digital archives, community education, and feminist media.
 - The hero headline is: Reclaiming Space. Building Community. Ending Victim Blaming.
-- The featured section currently acts as a placeholder for a campaign, donation push, or event announcement.
-- The password gate is client-side demo behavior only; it does not provide real access control.
+- The featured section now invites visitors to join the next organizing circle and support community action.
+- The protected area is presented as a community space rather than a placeholder layout.
 
 ## Implementation
 
 ### Root static site
 
 - [index.html](index.html) is the published landing page for GitHub Pages.
-- [styles.css](styles.css) provides the full visual system for that static site.
-- The page expects shared assets like `hero.jpg` in the repository root.
+- [styles.css](styles.css) provides the shared visual system for that static site.
 
 ### Next.js app
 
 - [app/page.tsx](app/page.tsx) renders the same experience in React.
-- It stores the gate state in `localStorage` under `slutwalk-access`.
 - [app/layout.tsx](app/layout.tsx) defines the metadata and root document shell.
-- [app/globals.css](app/globals.css) contains the app-wide base styles and the shared design tokens.
+- [app/globals.css](app/globals.css) contains the app-wide base styles and shared design tokens.
+- The access state is persisted in localStorage under slutwalk-access.
 
 ## Deployment
 
-- GitHub Pages should serve the repository root so it lands on [index.html](index.html).
-- The old `prototype/` folder has been removed to avoid a second, unused entry point.
-- `npm run build` validates the Next.js app and confirms the repo still compiles cleanly.
+- GitHub Pages serves the repository root so the site opens from [index.html](index.html).
+- npm run build validates the Next.js app and confirms the repository still compiles cleanly.
 
 ## File Map
 
@@ -63,6 +61,6 @@ The page includes:
 
 ## Notes
 
-- The static and Next versions are intentionally similar, not identical in implementation.
-- The static page has no JavaScript gating logic; the React version does.
-- The current styling assumes a dark, neon-punk palette and can be extended with image assets later.
+- The static and Next versions are intentionally similar, while remaining implemented differently.
+- The static page uses inline script for the access gate, while the React version handles it in component state.
+- The styling is built around a dark, neon-punk palette that can be extended with additional media later.
