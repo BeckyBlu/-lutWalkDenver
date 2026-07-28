@@ -41,7 +41,9 @@ export function verifyToken(token: string) {
     const sigBuf = Buffer.from(signature, 'base64url');
     const expBuf = Buffer.from(expectedSignature, 'base64url');
 
-    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+    // Compare decoded byte buffers. timingSafeEqual throws a RangeError for
+    // mismatched buffer lengths, which the surrounding try/catch converts to null.
+    if (!crypto.timingSafeEqual(sigBuf, expBuf)) {
       return null;
     }
 

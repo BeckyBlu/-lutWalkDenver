@@ -210,7 +210,7 @@ export default function BulletinPage() {
             </div>
 
             <div className="chat-input">
-              <label htmlFor="messageInput" className="sr-only">Chat message</label>
+              <label htmlFor="messageInput">Chat message</label>
               <input
                 type="text"
                 id="messageInput"
