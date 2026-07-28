@@ -1,8 +1,140 @@
 'use client';
 
 import Link from 'next/link';
+import { useState, type ChangeEvent, type KeyboardEvent } from 'react';
+
+type ChatMessage = {
+  sender: string;
+  text: string;
+  sent?: boolean;
+  time: string;
+};
+
+type ThreadReply = {
+  text: string;
+  time: string;
+};
+
+type Thread = {
+  id: number;
+  title: string;
+  text: string;
+  imageSrc?: string;
+  createdAt: string;
+  replies: ThreadReply[];
+};
+
+const now = () => new Date().toLocaleString();
+
+const initialMessages: ChatMessage[] = [
+  {
+    sender: 'Moderator',
+    text: 'Welcome! Introduce yourself and be respectful.',
+    time: now(),
+  },
+];
+
+const initialThreads: Thread[] = [
+  {
+    id: 1,
+    title: 'Welcome to the community board',
+    text: 'Use this space for organizing, resources, event planning, and respectful discussion.',
+    createdAt: now(),
+    replies: [],
+  },
+];
 
 export default function BulletinPage() {
+  const [chatInput, setChatInput] = useState('');
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const [threadTitle, setThreadTitle] = useState('');
+  const [threadText, setThreadText] = useState('');
+  const [threadImage, setThreadImage] = useState('');
+  const [threads, setThreads] = useState<Thread[]>(initialThreads);
+  const [replyInputs, setReplyInputs] = useState<Record<number, string>>({});
+
+  const addChatMessage = () => {
+    const value = chatInput.trim();
+    if (!value) return;
+
+    setMessages((current) => [
+      ...current,
+      { sender: 'You', text: value, sent: true, time: now() },
+    ]);
+    setChatInput('');
+  };
+
+  const handleSendKey = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      addChatMessage();
+    }
+  };
+
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      setThreadImage('');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setThreadImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const addThread = () => {
+    const title = threadTitle.trim();
+    const text = threadText.trim();
+    if (!title || !text) return;
+
+    setThreads((current) => [
+      {
+        id: Date.now(),
+        title,
+        text,
+        imageSrc: threadImage || undefined,
+        createdAt: now(),
+        replies: [],
+      },
+      ...current,
+    ]);
+
+    setThreadTitle('');
+    setThreadText('');
+    setThreadImage('');
+  };
+
+  const updateReplyInput = (threadId: number, value: string) => {
+    setReplyInputs((current) => ({
+      ...current,
+      [threadId]: value,
+    }));
+  };
+
+  const addReply = (threadId: number) => {
+    const replyText = replyInputs[threadId]?.trim();
+    if (!replyText) return;
+
+    setThreads((current) =>
+      current.map((thread) =>
+        thread.id === threadId
+          ? {
+              ...thread,
+              replies: [...thread.replies, { text: replyText, time: now() }],
+            }
+          : thread
+      )
+    );
+
+    setReplyInputs((current) => ({
+      ...current,
+      [threadId]: '',
+    }));
+  };
+
   return (
     <main className="shell">
       <header className="hero">
@@ -25,19 +157,127 @@ export default function BulletinPage() {
 
       <section className="featured">
         <h2>Community posts</h2>
-        <div className="community-board">
-          <article>
-            <h3>Announcements</h3>
-            <p>Volunteer sign-up, wellness reminders, and upcoming actions.</p>
-          </article>
-          <article>
-            <h3>Mutual aid</h3>
-            <p>Ride shares, food support, and local resource sharing.</p>
-          </article>
-          <article>
-            <h3>Discussion topics</h3>
-            <p>Education circles, event planning, and archive collaboration.</p>
-          </article>
+        <div className="bulletin-grid">
+          <div className="community-board">
+            <article>
+              <h3>Announcements</h3>
+              <p>Volunteer sign-up, wellness reminders, and upcoming actions.</p>
+            </article>
+            <article>
+              <h3>Mutual aid</h3>
+              <p>Ride shares, food support, and local resource sharing.</p>
+            </article>
+            <article>
+              <h3>Discussion topics</h3>
+              <p>Education circles, event planning, and archive collaboration.</p>
+            </article>
+          </div>
+
+          <section className="chat-container">
+            <header className="chat-header">
+              <h2>Community Chat</h2>
+              <span className="status">● Online</span>
+            </header>
+
+            <div className="chat-window" id="chatWindow">
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`message ${message.sent ? 'sent' : 'received'}`}
+                >
+                  <div className="avatar">
+                    {message.sender.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="bubble">
+                    <h4>{message.sender}</h4>
+                    <p>{message.text}</p>
+                    <small>{message.time}</small>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="chat-input">
+              <input
+                type="text"
+                id="messageInput"
+                placeholder="Write a message..."
+                aria-label="Chat message"
+                value={chatInput}
+                onChange={(event) => setChatInput(event.target.value)}
+                onKeyDown={handleSendKey}
+              />
+              <button type="button" id="sendBtn" onClick={addChatMessage}>
+                Send
+              </button>
+            </div>
+
+            <section className="new-thread">
+              <h2>Create New Thread</h2>
+              <input
+                id="threadTitle"
+                type="text"
+                placeholder="Thread title"
+                value={threadTitle}
+                onChange={(event) => setThreadTitle(event.target.value)}
+              />
+              <textarea
+                id="threadText"
+                rows={5}
+                placeholder="Start a discussion..."
+                value={threadText}
+                onChange={(event) => setThreadText(event.target.value)}
+              />
+              <input
+                id="threadImage"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              <button type="button" id="postThread" onClick={addThread}>
+                Post Thread
+              </button>
+            </section>
+
+            <h3 className="thread-list-title">Recent Threads</h3>
+            <div id="threads">
+              {threads.map((thread) => (
+                <article className="thread" key={thread.id}>
+                  <div className="thread-header">
+                    <strong>Anonymous</strong> • {thread.createdAt}
+                  </div>
+                  <div className="thread-body">
+                    <h3>{thread.title}</h3>
+                    {thread.imageSrc ? (
+                      <img src={thread.imageSrc} alt="Thread image" />
+                    ) : null}
+                    <p>{thread.text}</p>
+                    <div className="replies">
+                      {thread.replies.map((reply, index) => (
+                        <div className="reply" key={index}>
+                          <small>Anonymous • {reply.time}</small>
+                          <div>{reply.text}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="reply-form">
+                    <textarea
+                      rows={3}
+                      placeholder="Write a reply..."
+                      value={replyInputs[thread.id] || ''}
+                      onChange={(event) =>
+                        updateReplyInput(thread.id, event.target.value)
+                      }
+                    />
+                    <button type="button" onClick={() => addReply(thread.id)}>
+                      Reply
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
         </div>
       </section>
     </main>
