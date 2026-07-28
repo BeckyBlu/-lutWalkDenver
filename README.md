@@ -22,6 +22,22 @@ The previous GitHub Pages/Netlify static fallback is removed.
    - API endpoints under `/api/*` respond on custom domain.
    - Login/logout cookie flows work over HTTPS.
 
+
+## Runtime requirements
+
+This repository contains the full application stack required for production:
+
+| Requirement | Implementation in this repo |
+| --- | --- |
+| Backend server | Next.js App Router route handlers in `app/api/**` plus `middleware.ts` for protected routes. |
+| Database/storage | Firebase Admin SDK on the server for Firestore records and uploaded asset metadata/storage. |
+| Package manager | npm with the committed `package-lock.json`. |
+| Build pipeline | `npm ci` followed by `npm run build`; production runs with `npm run start` or a Next.js-compatible platform runtime. |
+| Framework | Next.js 15 with React 19 and TypeScript. |
+| Custom domain | `CNAME` and `public/CNAME` both contain `slutwalkdenver.gay`. |
+
+See [Deployment Runbook](docs/deployment-runbook.md) for the step-by-step production checklist.
+
 ## Core member flow (locked behavior)
 
 1. Public user lands on `/`.
