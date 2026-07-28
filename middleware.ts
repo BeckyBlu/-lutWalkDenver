@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyTokenEdge } from './lib/auth-edge';
 
-const MEMBER_PATHS = [
+// Paths that require either a member or admin token
+const AUTH_REQUIRED_PATHS = [
   '/archive',
   '/bulletin',
   '/calendar',
@@ -27,8 +28,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Member routes: accept either a member token or an admin token
-  if (MEMBER_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
+  // Routes that accept either a member token or an admin token
+  if (AUTH_REQUIRED_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
     const memberToken = request.cookies.get('sw_auth')?.value;
     const adminToken = request.cookies.get('sw_admin')?.value;
     const isAuthorized =

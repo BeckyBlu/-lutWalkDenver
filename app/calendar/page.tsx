@@ -126,7 +126,7 @@ export default function CalendarPage() {
 
   const eventsThisMonth = events.filter((e) => {
     const [ey, em] = e.date.split('-').map(Number);
-    return ey === year && (em as number) - 1 === month;
+    return ey === year && em - 1 === month;
   });
 
   const eventsByDay: Record<number, CalendarEvent[]> = {};

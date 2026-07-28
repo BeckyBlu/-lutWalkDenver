@@ -4,29 +4,6 @@ import { verifyToken } from '../../../lib/auth';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
 
-function getCallerRole(cookieHeader: string | null): 'member' | 'admin' | null {
-  if (!cookieHeader) return null;
-  const jar = Object.fromEntries(
-    cookieHeader.split(';').map((c) => {
-      const [k, ...v] = c.trim().split('=');
-      return [k?.trim() ?? '', v.join('=')];
-    }),
-  );
-
-  const memberToken = jar['sw_auth'];
-  const adminToken = jar['sw_admin'];
-
-  if (adminToken) {
-    const payload = verifyToken(adminToken);
-    if (payload?.sub === 'admin') return 'admin';
-  }
-  if (memberToken) {
-    const payload = verifyToken(memberToken);
-    if (payload?.sub === 'member' || payload?.sub === 'admin') return 'member';
-  }
-  return null;
-}
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const limitParam = Number(searchParams.get('limit') ?? '20');
