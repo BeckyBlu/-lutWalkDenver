@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   const response = NextResponse.json({ ok: true });
 
   response.cookies.set({
-    name: 'sw_auth',
+    name: 'sw_admin',
     value: '',
     httpOnly: true,
     path: '/',
