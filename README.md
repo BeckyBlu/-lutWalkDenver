@@ -1,94 +1,85 @@
+## SlutWalk Denver web app
 
-## Overview
+This repository is now a **Next.js-only** deployment target (App Router).  
+The previous GitHub Pages/Netlify static fallback is removed.
 
-This repository contains two aligned implementations of the same SlutWalk Denver experience:
+## Production target and domain
 
-- A static landing page at the repository root for GitHub Pages
-- A Next.js app-router version under app/
+- Canonical production host: **Next.js hosting platform (recommended: Vercel)**.
+- Canonical domain: **`slutwalkdenver.gay`**.
+- `www.slutwalkdenver.gay` should 301 redirect to `slutwalkdenver.gay`.
 
-Both versions share the same visual language, member access flow, and community-focused structure.
+### Porkbun DNS setup
 
-## Experience
+1. Add `slutwalkdenver.gay` and `www.slutwalkdenver.gay` in your hosting provider domain settings.
+2. In Porkbun DNS:
+   - Apex (`@`) record → provider target for the root domain.
+   - `www` CNAME → provider target (or to apex if your provider requires that).
+3. Enable HTTPS in the hosting provider dashboard.
+4. Configure the provider-level canonical redirect: `www.slutwalkdenver.gay` → `https://slutwalkdenver.gay`.
+5. Verify:
+   - App routes load on custom domain.
+   - API endpoints under `/api/*` respond on custom domain.
+   - Login/logout cookie flows work over HTTPS.
 
-The site now includes:
+## Core member flow (locked behavior)
 
-- A full-screen hero for SlutWalk Denver
-- A shared member access gate that unlocks the protected dashboard
-- A public landing section that explains the collective and directs visitors into the community space
-- An About section embedded on the homepage, with [about.html](about.html) redirecting back to [index.html](index.html#about)
-- A protected dashboard with timeline, zine, event, bulletin, chat, and archive sections
-- Separate administrator access for organizers
+1. Public user lands on `/`.
+2. User submits member password at `/api/auth/login`.
+3. Server sets `sw_auth` (httpOnly) and clears `sw_admin`.
+4. Protected routes (`/archive`, `/bulletin`, `/calendar`, `/community`, `/events`, `/shop`, `/zines`) are accessible through middleware token verification.
+5. Unauthorized access to protected member routes is redirected to `/`.
 
-## Access
+## Admin separation requirement
 
-- Members enter through a shared password defined in both the static page and the React page.
-- Administrators use a different password for the portal experience.
-- Successful entry stores access in browser storage so the protected content remains available on return visits.
+- Admin login route is separate: `/admin-login` → `/api/auth/admin-login`.
+- Admin session uses `sw_admin` cookie only.
+- Member session uses `sw_auth` cookie only.
+- Admin login clears member cookie; member login clears admin cookie.
+- `/admin` route is admin-only in middleware.
 
-## Content Notes
+## Gallery + upload architecture
 
-- The experience centers survivor-led organizing, digital archives, community education, and feminist media.
-- The hero headline is: $lutWalk Denver is a living collective.
-- The protected area is presented as a community hub rather than a placeholder layout.
+- Binary upload endpoint: `/api/upload`.
+- Gallery metadata endpoints:
+  - `GET /api/gallery` (member/admin access)
+  - `POST /api/gallery` (admin only)
+  - `DELETE /api/gallery/[id]` (admin only)
+- Firestore collection: `galleryAssets`.
+- Community page (`/community`) renders uploaded `community` gallery assets.
+- Archive page (`/archive`) renders uploaded `archive` gallery assets grouped by category.
+- Admin dashboard archive tab uploads files and publishes metadata records.
 
-## Implementation
+## Legacy path redirects
 
-### Root static site
+`next.config.mjs` now permanently redirects:
 
-- [index.html](index.html) is the published landing page for GitHub Pages.
-- [styles.css](styles.css) provides the shared visual system for the static pages.
-- The additional static pages include [zine.html](zine.html), [bulletin.html](bulletin.html), [calendar.html](calendar.html), [community.html](community.html), and [admin-login.html](admin-login.html).
-- [about.html](about.html) now redirects to the About section on [index.html](index.html#about).
-- Static member/admin pages load [static/js/gate.js](static/js/gate.js) so the current gate behavior stays centralized.
+- `/index.html` → `/`
+- `/about.html` → `/about`
+- `/bulletin.html` → `/bulletin`
+- `/calendar.html` → `/calendar`
+- `/community.html` → `/community`
+- `/zine.html` → `/zines`
+- `/admin-login.html` → `/admin-login`
 
-### Next.js app
+## Local development
 
-- [app/page.tsx](app/page.tsx) renders the same experience in React.
-- [app/bulletin/page.tsx](app/bulletin/page.tsx) provides the bulletin board with chat and thread interaction.
-- [app/layout.tsx](app/layout.tsx) defines the metadata and root document shell.
-- [app/globals.css](app/globals.css) contains the app-wide base styles and shared design tokens.
-- The access state is persisted in localStorage under slutwalk-access.
+```bash
+npm install
+npm run dev
+```
 
-## Deployment
+## Validation
 
-- GitHub Pages serves the repository root so the site opens from [index.html](index.html).
-- npm run build validates the Next.js app and confirms the repository still compiles cleanly.
+- Build: `npm run build`
+- Type-check: `npx tsc --noEmit`
 
-## I2P Eepsite
+## Required environment variables
 
-The site can be accessed inside the I2P anonymity network for members who need stronger operational security. See [i2p.md](i2p.md) for full setup instructions.
+Copy `.env.example` to `.env.local` and set values for:
 
-| Address type | Address |
-|---|---|
-| Base32 (auto-generated) | *(published separately by organizers)* |
-| Vanity hostname | `slutwalkdenver.i2p` *(pending registration)* |
-
-**Privacy properties implemented:**
-
-- All Firestore reads/writes are server-side only — the browser never contacts Google directly.
-- Strict `Content-Security-Policy`, `X-Frame-Options: DENY`, and `Referrer-Policy: no-referrer` headers block external leaks.
-- All static HTML files carry an equivalent CSP meta tag for the GitHub Pages build.
-- No CDN fonts, analytics, or third-party scripts anywhere in the codebase.
-
-## File Map
-
-- [index.html](index.html)
-- [styles.css](styles.css)
-- [app/page.tsx](app/page.tsx)
-- [app/layout.tsx](app/layout.tsx)
-- [app/globals.css](app/globals.css)
-- [package.json](package.json)
-- [tsconfig.json](tsconfig.json)
-
-## To-Do
-
-- Confirm the site flow: public landing → password entry → dashboard.
-- Keep the administrator portal as a separate admin password gateway, distinct from member login.
-- Add image upload support for community pages and shared asset galleries.
-- Decide whether the GitHub Pages fallback should remain; if not, fold the remaining static pages into the app-router experience.
-
-## Notes
-
-- The static and Next versions are intentionally similar while remaining implemented differently.
-- The static pages share an external gate script with local fallback passwords for the GitHub Pages build, while the React version handles access in component state.
-- The styling is built around a dark, neon-punk palette that can be extended with additional media later.
+- `AUTH_SECRET`
+- `MEMBER_PASSWORD`
+- `ADMIN_PASSWORD`
+- Firebase Admin SDK credentials
+- Firebase client SDK values
