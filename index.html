@@ -8,6 +8,55 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <script>
+      const ACCESS_PASSWORD = 'GurlGang2030!';
+      const ACCESS_KEY = 'slutwalk-access';
+
+      function setUnlockedState(isUnlocked) {
+        const content = document.querySelector('.content');
+        const form = document.querySelector('.gate-form');
+        const button = document.querySelector('.gate-form button');
+        const input = document.querySelector('.gate-form input');
+
+        if (content) {
+          content.classList.toggle('content--locked', !isUnlocked);
+          content.classList.toggle('content--open', isUnlocked);
+        }
+
+        if (form && input && button) {
+          input.disabled = isUnlocked;
+          button.disabled = isUnlocked;
+          button.textContent = isUnlocked ? 'Unlocked' : 'Enter site';
+        }
+      }
+
+      function handleSubmit(event) {
+        event.preventDefault();
+        const input = document.querySelector('.gate-form input');
+        if (!input) return;
+
+        if (input.value === ACCESS_PASSWORD) {
+          window.localStorage.setItem(ACCESS_KEY, 'true');
+          setUnlockedState(true);
+          input.value = '';
+          return;
+        }
+
+        window.localStorage.removeItem(ACCESS_KEY);
+        setUnlockedState(false);
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const form = document.querySelector('.gate-form');
+        if (form) {
+          form.addEventListener('submit', handleSubmit);
+        }
+
+        const isUnlocked = window.localStorage.getItem(ACCESS_KEY) === 'true';
+        setUnlockedState(isUnlocked);
+      });
+    </script>
+
     <main class="shell">
       <header class="hero">
         <nav>
@@ -43,7 +92,7 @@
       <section id="login" class="login-card">
         <p class="eyebrow">Members only</p>
         <h2>Access the community space</h2>
-        <form class="gate-form">
+        <form class="gate-form" onsubmit="handleSubmit(event)">
           <label for="password">Access password</label>
           <div class="form-row">
             <input
@@ -52,7 +101,7 @@
               type="password"
               placeholder="GurlGang2030!"
             />
-            <button type="button">Enter site</button>
+            <button type="submit">Enter site</button>
           </div>
           <p class="helper">Demo-only gate for layout purposes.</p>
         </form>
@@ -67,7 +116,7 @@
         </p>
       </section>
 
-      <section class="content">
+      <section class="content content--locked">
         <section class="timeline">
           <article>
             <h2>2011</h2>
