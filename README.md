@@ -1,174 +1,68 @@
-# -$lutWalkDenver
 
-## Product Brief
 
-This repository now contains a visual prototype and a starter scaffold for a SlutWalk Denver community site.
+## Overview
 
-## Project Goal
+This repository contains two aligned implementations of the same SlutWalk Denver site:
 
-Create a gated, member-facing web experience with:
+- A static site at the repository root for GitHub Pages
+- A Next.js app router version under `app/`
 
-- A password-protected landing page
-- A chatroom for ongoing member conversation
-- A bulletin board for threaded posts and announcements
-- Calendar access for events and volunteer coordination
-- E-commerce for merch and older zines
+Both versions use the same structure, copy, and visual language so the deployed Pages site and the Next starter stay in sync.
 
-## SlutWalk Denver Context
+## Experience
 
-SlutWalk Denver is a survivor-led, intersectional demonstration against rape culture and victim-blaming. The event began in 2011 and has recurred most years since, often in early summer. Organizers and participants center marginalized groups, including sex workers, BIPOC, LGBTQ+ people, survivors, and allies.
+The page includes:
 
-The site should reflect that history without flattening it into generic activism branding. It should feel like a community archive, a coordination hub, and a store all in one place.
+- A full-screen hero for SlutWalk Denver
+- A shared-password member gate
+- A featured campaign or announcement block
+- A compact movement timeline with the years 2011, 2020, 2021, and 2022
+- Zine, event, community-board, and archive sections
 
-## Core Messaging
+## Password
 
-- Challenge victim-blaming and shift attention toward assaulters and systems of harm
-- Center consent culture, bodily autonomy, and survivor voice
-- Make space for coalition work with local nonprofits and mutual-aid partners
-- Present the movement as both political and communal, not just event promotion
+- Demo password: `***REMOVED***`
 
-## Historical Anchors
+## Content Notes
 
-- 2011 first march at Civic Center Park, with roughly 400 attendees
-- Early routes looped through Civic Center Park and sometimes down Colfax Avenue
-- Later events shifted to Cheesman Park and, in some years, stationary formats for safety
-- Community coverage has come from local and alternative outlets, social media, and organizer posts
+- The site centers survivor-led organizing, digital archives, community education, and feminist media.
+- The hero headline is: Reclaiming Space. Building Community. Ending Victim Blaming.
+- The featured section currently acts as a placeholder for a campaign, donation push, or event announcement.
+- The password gate is client-side demo behavior only; it does not provide real access control.
 
-## Suggested Homepage Sections
+## Implementation
 
-- Hero statement and access gate
-- Short origin story and mission block
-- Featured timeline or history strip
-- Partner and community allies section
-- Featured announcement or next event
-- Board preview
-- Calendar preview
-- Store preview for merch and archived zines
+### Root static site
 
-## Audience
+- [index.html](index.html) is the published landing page for GitHub Pages.
+- [styles.css](styles.css) provides the full visual system for that static site.
+- The page expects shared assets like `hero.jpg` in the repository root.
 
-- SlutWalk Denver members
-- Volunteers and organizers
-- Event attendees who have the access password
-- Readers and collectors looking for archived zines
+### Next.js app
 
-## Tone And Visual Direction
+- [app/page.tsx](app/page.tsx) renders the same experience in React.
+- It stores the gate state in `localStorage` under `slutwalk-access`.
+- [app/layout.tsx](app/layout.tsx) defines the metadata and root document shell.
+- [app/globals.css](app/globals.css) contains the app-wide base styles and the shared design tokens.
 
-- Loud, handmade, zine-inspired, and community-first
-- Editorial typography with strong contrast and bold sectioning
-- Flexible blocks that can absorb photos, flyers, scans, and posters
-- Easy to scan on mobile while still feeling expansive on desktop
+## Deployment
 
-## Information Architecture
+- GitHub Pages should serve the repository root so it lands on [index.html](index.html).
+- The old `prototype/` folder has been removed to avoid a second, unused entry point.
+- `npm run build` validates the Next.js app and confirms the repo still compiles cleanly.
 
-- `/` Password landing page
-- `/home` Member dashboard
-- `/board` Bulletin board
-- `/chat` Chatroom
-- `/calendar` Calendar
-- `/store` Merch and zines
-- `/rules` Community guidelines
-- `/about` Mission and organizer info
+## File Map
 
-## Landing Page Copy Draft
+- [index.html](index.html)
+- [styles.css](styles.css)
+- [app/page.tsx](app/page.tsx)
+- [app/layout.tsx](app/layout.tsx)
+- [app/globals.css](app/globals.css)
+- [package.json](package.json)
+- [tsconfig.json](tsconfig.json)
 
-Headline: SlutWalk Denver Community Access
+## Notes
 
-Support copy: Enter with the shared password to reach the members-only space for conversation, planning, events, and store access.
-
-Password label: Access password
-
-Primary button: Enter site
-
-Helper note: Demo password for the starter is ***REMOVED***
-
-## Dashboard Copy Draft
-
-Welcome line: You are in. Use the dashboard to jump into conversation, board posts, upcoming events, and the store.
-
-Mission line: SlutWalk Denver creates space for survivors and allies to organize, remember, and keep pushing back against victim-blaming.
-
-Section headers:
-
-- Featured announcement
-- Latest board activity
-- Upcoming events
-- Featured merch
-- Archived zine spotlight
-
-## Copy Blocks To Reuse
-
-- A one-sentence origin block for the 2011 Denver march
-- A short mission block centered on consent, accountability, and survivor voice
-- A community block naming allies, organizers, and partner groups
-- A safety block that explains why some events are stationary or password-gated
-- A store block that separates merch from archival zines
-
-## Wireframe Notes
-
-### Landing
-
-- Centered gate card with headline, description, password field, and enter button
-- Background art or poster image behind the card
-- Small callout for rules, contact, or support beneath the form
-
-### Dashboard
-
-- Large hero block with featured announcement
-- Two-column content grid on desktop, stacked on mobile
-- Utility cards for calendar, chat, and store
-- Product rail for shirts, zines, stickers, or patches
-
-### Bulletin Board
-
-- Board index on the left or top
-- Thread cards with title, poster name, reply count, and last activity
-- Optional image thumbnails for approved posts
-- Sticky rules banner at the top
-
-### Chatroom
-
-- Channel list
-- Message timeline
-- Simple composer with attach and send controls
-
-### Store
-
-- Product grid with image, title, short description, price, and availability
-- Zine archive section separated from merch
-- Cart summary panel for checkout flow
-
-## Content Model
-
-Use repeatable cards and fields so the site is easy to maintain:
-
-- Title
-- Short description
-- Image or poster
-- Date or issue number
-- Price
-- Availability
-- Link or CTA
-
-## Timeline Content Model
-
-Use this if you want a compact history strip on the homepage or about page:
-
-- 2011: first march at Civic Center Park
-- 2012: continued annual rally
-- 2014: benefit events and broader local attention
-- 2020: pandemic-era march with rerouted safety planning
-- 2021: 10th annual event at Cheesman Park pavilion
-
-## Prototype And Starter Files
-
-- `prototype/index.html` and `prototype/styles.css` for a static visual prototype
-- `app/page.tsx`, `app/layout.tsx`, and `app/globals.css` for a Next.js starter
-- `package.json` and config files for a minimal runnable scaffold
-
-## Open Questions
-
-- Should the board support images at launch or stay text-first?
-- Should the calendar be embedded or linked out?
-- Which store platform should be used for fulfillment and checkout?
-- Should the access password stay shared or move to member accounts later?
+- The static and Next versions are intentionally similar, not identical in implementation.
+- The static page has no JavaScript gating logic; the React version does.
+- The current styling assumes a dark, neon-punk palette and can be extended with image assets later.
