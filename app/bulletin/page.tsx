@@ -126,9 +126,19 @@ export default function BulletinPage() {
     const msgInterval = setInterval(() => { void loadMessages(); }, 5_000);
     const threadInterval = setInterval(() => { void loadThreads(); }, 15_000);
 
+    // Pause polling while the tab is hidden; resume immediately on becoming visible.
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        void loadMessages();
+        void loadThreads();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
       clearInterval(msgInterval);
       clearInterval(threadInterval);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [loadMessages, loadThreads]);
 
