@@ -141,14 +141,25 @@ export default function HomePage() {
         <section className="community-board">
           <article>
             <h3>Announcements</h3>
+            <p>Volunteer sign-up, wellness reminders, and upcoming actions.</p>
           </article>
 
           <article>
-            <h3>Discussion</h3>
+            <h3>Bulletin board</h3>
+            <p>Community updates, mutual aid offers, and event flyers.</p>
           </article>
 
           <article>
             <h3>Resources</h3>
+            <p>Links to zines, organizers, and local support networks.</p>
+          </article>
+        </section>
+
+        <section className="chatroom">
+          <article>
+            <p className="eyebrow">Members chat</p>
+            <h3>Community chatroom</h3>
+            <p>Share logistics, planning notes, and solidarity updates with members.</p>
           </article>
         </section>
 
