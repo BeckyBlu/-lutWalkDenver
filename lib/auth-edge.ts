@@ -5,11 +5,15 @@
  * async verifyToken that is compatible with both Edge and Node.js runtimes.
  */
 
-function base64urlDecode(b64url: string): Uint8Array {
+function base64urlDecode(b64url: string): ArrayBuffer {
   const b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
   const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4);
   const binary = atob(padded);
-  return Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
 }
 
 export async function verifyTokenEdge(token: string): Promise<Record<string, unknown> | null> {

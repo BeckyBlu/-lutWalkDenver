@@ -56,7 +56,7 @@ export default function HomePage() {
 
   const handleDecline = () => {
     window.localStorage.removeItem(ACCESS_KEY);
-    window.location.href = 'https://example.com';
+    window.location.href = '/';
   };
 
   return (

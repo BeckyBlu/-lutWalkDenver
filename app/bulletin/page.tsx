@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, type ChangeEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from 'react';
 
 type ChatMessage = {
+  id: number;
   sender: string;
   text: string;
   sent?: boolean;
@@ -11,6 +12,7 @@ type ChatMessage = {
 };
 
 type ThreadReply = {
+  id: number;
   text: string;
   time: string;
 };
@@ -28,6 +30,7 @@ const now = () => new Date().toLocaleString();
 
 const initialMessages: ChatMessage[] = [
   {
+    id: 1,
     sender: 'Moderator',
     text: 'Welcome! Introduce yourself and be respectful.',
     time: now(),
@@ -52,6 +55,15 @@ export default function BulletinPage() {
   const [threadImage, setThreadImage] = useState('');
   const [threads, setThreads] = useState<Thread[]>(initialThreads);
   const [replyInputs, setReplyInputs] = useState<Record<number, string>>({});
+  const chatWindowRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll chat window whenever a new message is added
+  useEffect(() => {
+    const el = chatWindowRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [messages]);
 
   const addChatMessage = () => {
     const value = chatInput.trim();
@@ -59,7 +71,7 @@ export default function BulletinPage() {
 
     setMessages((current) => [
       ...current,
-      { sender: 'You', text: value, sent: true, time: now() },
+      { id: Date.now(), sender: 'You', text: value, sent: true, time: now() },
     ]);
     setChatInput('');
   };
@@ -123,7 +135,7 @@ export default function BulletinPage() {
         thread.id === threadId
           ? {
               ...thread,
-              replies: [...thread.replies, { text: replyText, time: now() }],
+              replies: [...thread.replies, { id: Date.now(), text: replyText, time: now() }],
             }
           : thread
       )
@@ -179,10 +191,10 @@ export default function BulletinPage() {
               <span className="status">● Online</span>
             </header>
 
-            <div className="chat-window" id="chatWindow">
-              {messages.map((message, index) => (
+            <div className="chat-window" id="chatWindow" ref={chatWindowRef}>
+              {messages.map((message) => (
                 <div
-                  key={index}
+                  key={message.id}
                   className={`message ${message.sent ? 'sent' : 'received'}`}
                 >
                   <div className="avatar">
@@ -198,11 +210,11 @@ export default function BulletinPage() {
             </div>
 
             <div className="chat-input">
+              <label htmlFor="messageInput" className="sr-only">Chat message</label>
               <input
                 type="text"
                 id="messageInput"
                 placeholder="Write a message..."
-                aria-label="Chat message"
                 value={chatInput}
                 onChange={(event) => setChatInput(event.target.value)}
                 onKeyDown={handleSendKey}
@@ -214,6 +226,7 @@ export default function BulletinPage() {
 
             <section className="new-thread">
               <h2>Create New Thread</h2>
+              <label htmlFor="threadTitle">Thread title</label>
               <input
                 id="threadTitle"
                 type="text"
@@ -221,6 +234,7 @@ export default function BulletinPage() {
                 value={threadTitle}
                 onChange={(event) => setThreadTitle(event.target.value)}
               />
+              <label htmlFor="threadText">Thread text</label>
               <textarea
                 id="threadText"
                 rows={5}
@@ -228,6 +242,7 @@ export default function BulletinPage() {
                 value={threadText}
                 onChange={(event) => setThreadText(event.target.value)}
               />
+              <label htmlFor="threadImage">Thread image</label>
               <input
                 id="threadImage"
                 type="file"
@@ -253,8 +268,8 @@ export default function BulletinPage() {
                     ) : null}
                     <p>{thread.text}</p>
                     <div className="replies">
-                      {thread.replies.map((reply, index) => (
-                        <div className="reply" key={index}>
+                      {thread.replies.map((reply) => (
+                        <div className="reply" key={reply.id}>
                           <small>Anonymous • {reply.time}</small>
                           <div>{reply.text}</div>
                         </div>
@@ -262,7 +277,9 @@ export default function BulletinPage() {
                     </div>
                   </div>
                   <div className="reply-form">
+                    <label className="sr-only" htmlFor={`reply-${thread.id}`}>Write a reply</label>
                     <textarea
+                      id={`reply-${thread.id}`}
                       rows={3}
                       placeholder="Write a reply..."
                       value={replyInputs[thread.id] || ''}
