@@ -9,18 +9,29 @@ The previous GitHub Pages/Netlify static fallback is removed.
 - Canonical domain: **`slutwalkdenver.gay`**.
 - `www.slutwalkdenver.gay` should 301 redirect to `slutwalkdenver.gay`.
 
-### Porkbun DNS setup
+## Landing Page
 
-1. Add `slutwalkdenver.gay` and `www.slutwalkdenver.gay` in your hosting provider domain settings.
-2. In Porkbun DNS:
-   - Apex (`@`) record → provider target for the root domain.
-   - `www` CNAME → provider target (or to apex if your provider requires that).
-3. Enable HTTPS in the hosting provider dashboard.
-4. Configure the provider-level canonical redirect: `www.slutwalkdenver.gay` → `https://slutwalkdenver.gay`.
-5. Verify:
-   - App routes load on custom domain.
-   - API endpoints under `/api/*` respond on custom domain.
-   - Login/logout cookie flows work over HTTPS.
+↓
+
+Password Entry
+
+↓
+
+Member Dashboard
+
+↓
+
+About
+
+Store
+
+Bulletin Board
+
+Calendar
+
+↓
+
+Admin
 
 
 ## Runtime requirements
