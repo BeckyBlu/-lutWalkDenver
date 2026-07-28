@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bulletin | SlutWalk Denver</title>
     <meta name="description" content="Bulletin board for SlutWalk Denver." />
+    <script src="static/js/auth-guard.js"></script>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -14,7 +15,7 @@
           <div class="logo">$lutWalk Denver</div>
           <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About</a></li>
+            <li><a href="index.html#about">About</a></li>
             <li><a href="zine.html">Store</a></li>
             <li><a href="calendar.html">Calendar</a></li>
             <li><a href="admin-login.html">Admin</a></li>
@@ -47,11 +48,11 @@
 
           <section class="chat-container">
             <header class="chat-header">
-              <h2>Community Chat</h2>
+              <h3>Community Chat</h3>
               <span class="status">● Online</span>
             </header>
 
-            <div class="chat-window" id="chatWindow">
+            <div class="chat-window" id="chatWindow" aria-live="polite" aria-relevant="additions">
               <div class="message received">
                 <div class="avatar">SW</div>
                 <div class="bubble">
@@ -63,141 +64,35 @@
             </div>
 
             <div class="chat-input">
+              <label for="messageInput">Chat message</label>
               <input
                 type="text"
                 id="messageInput"
                 placeholder="Write a message..."
-                aria-label="Chat message"
+                aria-describedby="chatHelp"
               >
               <button id="sendBtn" type="button">Send</button>
             </div>
+            <p id="chatHelp" class="helper">Press Enter to send your message.</p>
 
             <section class="new-thread">
-              <h2>Create New Thread</h2>
+              <h4>Create New Thread</h4>
+              <label for="threadTitle">Thread title</label>
               <input id="threadTitle" type="text" placeholder="Thread title" />
+              <label for="threadText">Thread text</label>
               <textarea id="threadText" rows="5" placeholder="Start a discussion..."></textarea>
+              <label for="threadImage">Thread image</label>
               <input id="threadImage" type="file" accept="image/*" />
               <button id="postThread" type="button">Post Thread</button>
             </section>
 
-            <h3 class="thread-list-title">Recent Threads</h3>
-            <div id="threads"></div>
+            <h4 class="thread-list-title">Recent Threads</h4>
+            <div id="threads" aria-live="polite" aria-relevant="additions"></div>
           </section>
         </div>
       </section>
 
-      <script>
-        const threadsEl = document.getElementById('threads');
-        const chatWindow = document.getElementById('chatWindow');
-        const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-
-        function timeStamp() {
-          return new Date().toLocaleString();
-        }
-
-        function appendChatMessage(sender, text, sent = false) {
-          const message = document.createElement('div');
-          message.className = `message ${sent ? 'sent' : 'received'}`;
-          message.innerHTML = `
-            <div class="avatar">${sender.charAt(0).toUpperCase()}${sender.charAt(1) || ''}</div>
-            <div class="bubble">
-              <h4>${sender}</h4>
-              <p>${text.replace(/\n/g, '<br>')}</p>
-              <small>${timeStamp()}</small>
-            </div>
-          `;
-
-          chatWindow.appendChild(message);
-          chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-
-        function sendChatMessage() {
-          const value = messageInput.value.trim();
-          if (!value) return;
-
-          appendChatMessage('You', value, true);
-          messageInput.value = '';
-        }
-
-        sendBtn.addEventListener('click', sendChatMessage);
-        messageInput.addEventListener('keydown', (event) => {
-          if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            sendChatMessage();
-          }
-        });
-
-        function createThread(title, text, imageSrc) {
-          const thread = document.createElement('article');
-          thread.className = 'thread';
-
-          thread.innerHTML = `
-            <div class="thread-header">
-              <strong>Anonymous</strong> • ${timeStamp()}
-            </div>
-            <div class="thread-body">
-              <h3>${title}</h3>
-              ${imageSrc ? `<img src="${imageSrc}" alt="Thread image">` : ''}
-              <p>${text.replace(/\n/g, '<br>')}</p>
-
-              <div class="replies"></div>
-            </div>
-
-            <div class="reply-form">
-              <textarea rows="3" placeholder="Write a reply..."></textarea>
-              <button>Reply</button>
-            </div>
-          `;
-
-          const replyBtn = thread.querySelector('.reply-form button');
-          const replyInput = thread.querySelector('.reply-form textarea');
-          const replies = thread.querySelector('.replies');
-
-          replyBtn.addEventListener('click', () => {
-            const value = replyInput.value.trim();
-            if (!value) return;
-
-            const reply = document.createElement('div');
-            reply.className = 'reply';
-            reply.innerHTML = `
-              <small>Anonymous • ${timeStamp()}</small>
-              <div>${value.replace(/\n/g, '<br>')}</div>
-            `;
-
-            replies.appendChild(reply);
-            replyInput.value = '';
-          });
-
-          threadsEl.prepend(thread);
-        }
-
-        document.getElementById('postThread').addEventListener('click', () => {
-          const title = document.getElementById('threadTitle').value.trim();
-          const text = document.getElementById('threadText').value.trim();
-          const file = document.getElementById('threadImage').files[0];
-
-          if (!title || !text) return;
-
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = e => createThread(title, text, e.target.result);
-            reader.readAsDataURL(file);
-          } else {
-            createThread(title, text, '');
-          }
-
-          document.getElementById('threadTitle').value = '';
-          document.getElementById('threadText').value = '';
-          document.getElementById('threadImage').value = '';
-        });
-
-        createThread(
-          'Welcome to the community board',
-          'Use this space for organizing, resources, event planning, and respectful discussion.',
-          ''
-        );
-      </script>
+      <script src="static/js/bulletin.js" defer></script>
     </main>
   </body>
 </html>
