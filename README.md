@@ -14,6 +14,37 @@ Create a gated, member-facing web experience with:
 - Calendar access for events and volunteer coordination
 - E-commerce for merch and older zines
 
+## SlutWalk Denver Context
+
+SlutWalk Denver is a survivor-led, intersectional demonstration against rape culture and victim-blaming. The event began in 2011 and has recurred most years since, often in early summer. Organizers and participants center marginalized groups, including sex workers, BIPOC, LGBTQ+ people, survivors, and allies.
+
+The site should reflect that history without flattening it into generic activism branding. It should feel like a community archive, a coordination hub, and a store all in one place.
+
+## Core Messaging
+
+- Challenge victim-blaming and shift attention toward assaulters and systems of harm
+- Center consent culture, bodily autonomy, and survivor voice
+- Make space for coalition work with local nonprofits and mutual-aid partners
+- Present the movement as both political and communal, not just event promotion
+
+## Historical Anchors
+
+- 2011 first march at Civic Center Park, with roughly 400 attendees
+- Early routes looped through Civic Center Park and sometimes down Colfax Avenue
+- Later events shifted to Cheesman Park and, in some years, stationary formats for safety
+- Community coverage has come from local and alternative outlets, social media, and organizer posts
+
+## Suggested Homepage Sections
+
+- Hero statement and access gate
+- Short origin story and mission block
+- Featured timeline or history strip
+- Partner and community allies section
+- Featured announcement or next event
+- Board preview
+- Calendar preview
+- Store preview for merch and archived zines
+
 ## Audience
 
 - SlutWalk Denver members
@@ -55,6 +86,8 @@ Helper note: Demo password for the starter is ***REMOVED***
 
 Welcome line: You are in. Use the dashboard to jump into conversation, board posts, upcoming events, and the store.
 
+Mission line: SlutWalk Denver creates space for survivors and allies to organize, remember, and keep pushing back against victim-blaming.
+
 Section headers:
 
 - Featured announcement
@@ -62,6 +95,14 @@ Section headers:
 - Upcoming events
 - Featured merch
 - Archived zine spotlight
+
+## Copy Blocks To Reuse
+
+- A one-sentence origin block for the 2011 Denver march
+- A short mission block centered on consent, accountability, and survivor voice
+- A community block naming allies, organizers, and partner groups
+- A safety block that explains why some events are stationary or password-gated
+- A store block that separates merch from archival zines
 
 ## Wireframe Notes
 
@@ -108,6 +149,16 @@ Use repeatable cards and fields so the site is easy to maintain:
 - Price
 - Availability
 - Link or CTA
+
+## Timeline Content Model
+
+Use this if you want a compact history strip on the homepage or about page:
+
+- 2011: first march at Civic Center Park
+- 2012: continued annual rally
+- 2014: benefit events and broader local attention
+- 2020: pandemic-era march with rerouted safety planning
+- 2021: 10th annual event at Cheesman Park pavilion
 
 ## Prototype And Starter Files
 
