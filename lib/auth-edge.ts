@@ -54,14 +54,21 @@ export async function verifyTokenEdge(token: string): Promise<Record<string, unk
       return null;
     }
 
-    const payload = JSON.parse(new TextDecoder().decode(base64urlDecode(encodedBody)));
+    const payload: unknown = JSON.parse(new TextDecoder().decode(base64urlDecode(encodedBody)));
 
-    // Reject expired tokens
-    if (typeof payload.exp !== 'number' || Math.floor(Date.now() / 1000) > payload.exp) {
+    // Validate that the payload is a plain object before indexing into it
+    if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
       return null;
     }
 
-    return payload as Record<string, unknown>;
+    const claims = payload as Record<string, unknown>;
+
+    // Reject expired tokens
+    if (typeof claims.exp !== 'number' || Math.floor(Date.now() / 1000) > claims.exp) {
+      return null;
+    }
+
+    return claims;
   } catch {
     return null;
   }
