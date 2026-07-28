@@ -40,6 +40,7 @@ export default function AdminLoginPage() {
       setUnlocked(true);
       setGateModel(initialGateModel);
       setMessage('Administrator access unlocked.');
+      window.location.href = '/admin';
       return;
     }
 
