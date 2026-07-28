@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 
@@ -34,11 +35,11 @@ export default function HomePage() {
           <div className="logo">$lutWalk Denver</div>
 
           <ul>
-            <li>About</li>
-            <li>Archive</li>
-            <li>Events</li>
-            <li>Zines</li>
-            <li>Community</li>
+            <li><Link href="/about">About</Link></li>
+            <li><Link href="/archive">Archive</Link></li>
+            <li><Link href="/events">Events</Link></li>
+            <li><Link href="/zines">Zines</Link></li>
+            <li><Link href="/community">Community</Link></li>
           </ul>
         </nav>
 

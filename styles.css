@@ -44,6 +44,11 @@ body {
 
 a {
   color: inherit;
+  text-decoration: none;
+}
+
+nav a:hover {
+  color: var(--white);
 }
 
 button,
