@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
+import type { GateModel } from './gate-model';
+import { initialGateModel } from './gate-model';
 
 const ACCESS_PASSWORD = 'GurlGang2030!';
 
 export default function HomePage() {
-  const [password, setPassword] = useState('');
+  const [gateModel, setGateModel] = useState<GateModel>(initialGateModel);
   const [unlocked, setUnlocked] = useState(false);
   const [message, setMessage] = useState('Members enter the shared password to unlock the dashboard.');
 
@@ -22,10 +24,10 @@ export default function HomePage() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (password === ACCESS_PASSWORD) {
+    if (gateModel.password === ACCESS_PASSWORD) {
       window.localStorage.setItem('slutwalk-access', 'true');
       setUnlocked(true);
-      setPassword('');
+      setGateModel(initialGateModel);
       setMessage('Welcome back. Your member dashboard is ready.');
       return;
     }
@@ -76,9 +78,9 @@ export default function HomePage() {
               id="password"
               name="password"
               type="password"
-              value={password}
+              value={gateModel.password}
               placeholder="Enter access password"
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) => setGateModel({ ...gateModel, password: event.target.value })}
             />
             <button type="submit">Enter community</button>
           </div>

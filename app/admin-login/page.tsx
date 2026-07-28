@@ -3,17 +3,19 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import type { GateModel } from '../gate-model';
+import { initialGateModel } from '../gate-model';
 
 const ADMIN_PASSWORD = 'Organizer2026!';
 
 export default function AdminLoginPage() {
-  const [password, setPassword] = useState('');
+  const [gateModel, setGateModel] = useState<GateModel>(initialGateModel);
   const [message, setMessage] = useState('Administrator access is protected by a separate password.');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (password === ADMIN_PASSWORD) {
+    if (gateModel.password === ADMIN_PASSWORD) {
       setMessage('Administrator access unlocked.');
       return;
     }
@@ -50,9 +52,9 @@ export default function AdminLoginPage() {
               id="admin-password"
               name="admin-password"
               type="password"
-              value={password}
+              value={gateModel.password}
               placeholder="Enter admin password"
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) => setGateModel({ ...gateModel, password: event.target.value })}
             />
             <button type="submit">Enter admin</button>
           </div>

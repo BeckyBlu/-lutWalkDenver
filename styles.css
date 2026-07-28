@@ -2,8 +2,7 @@
   color-scheme: dark;
   --pink: #ff2d95;
   --hot-pink: #ff4fb4;
-  --purple: #7d2cff;
-  --black: #111111;
+  --purple: #7d2cff;  --green: #1dd78d;  --black: #111111;
   --white: #ffffff;
   --cream: #f7f5ef;
   --gray: #8b8b8b;
@@ -303,6 +302,19 @@ button {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
+.bulletin-grid {
+  display: grid;
+  align-items: start;
+  grid-template-columns: minmax(320px, 1fr) 360px;
+  gap: 24px;
+}
+
+@media (max-width: 980px) {
+  .bulletin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .events article,
 .community-board article,
 .chatroom article,
@@ -310,6 +322,222 @@ button {
 .notice-grid article,
 .dashboard-card {
   padding: 2rem;
+}
+
+.chat-container {
+  display: grid;
+  gap: 24px;
+  padding: 2rem;
+  background: var(--white);
+  color: var(--black);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.05);
+}
+
+#threads {
+  display: grid;
+  gap: 20px;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-header h2 {
+  margin: 0;
+}
+
+.status {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.chat-window {
+  min-height: 260px;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) * 1.25);
+  background: var(--panel);
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.new-thread,
+.thread,
+.thread-body,
+.reply,
+.reply-form {
+  background: var(--white);
+}
+
+.new-thread {
+  padding: 2rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.05);
+  margin-top: 32px;
+}
+
+.new-thread h2 {
+  margin-top: 0;
+}
+
+.new-thread input[type="text"],
+.new-thread textarea,
+.reply-form textarea {
+  width: 100%;
+  padding: 0.85rem;
+  margin: 0.75rem 0 1rem;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) * 1.25);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text);
+}
+
+.new-thread input[type="file"] {
+  margin-bottom: 1rem;
+}
+
+.new-thread button,
+.reply-form button {
+  background: var(--gradient);
+  color: var(--black);
+  border: none;
+  padding: 0.9rem 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.thread {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+}
+
+.thread-header {
+  background: rgba(255, 248, 240, 0.95);
+  padding: 1rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+
+.thread-body {
+  padding: 1.5rem;
+}
+
+.thread-body img {
+  max-width: 100%;
+  display: block;
+  margin: 1rem 0;
+  border: 1px solid var(--line);
+}
+
+.reply {
+  background: rgba(250, 250, 250, 0.9);
+  border-top: 1px solid var(--line);
+  padding: 0.75rem 1rem;
+}
+
+.reply small {
+  color: var(--muted);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.reply-form {
+  padding: 1rem;
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.reply-form textarea {
+  margin-bottom: 0.75rem;
+}
+
+.message {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.message.received .bubble {
+  background: rgba(255, 248, 240, 0.95);
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--purple);
+  color: var(--white);
+  font-weight: 800;
+}
+
+.bubble {
+  padding: 1rem;
+  border-radius: calc(var(--radius) * 1.5);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.06);
+}
+
+.bubble h4 {
+  margin: 0 0 0.35rem 0;
+}
+
+.bubble p {
+  margin: 0 0 0.75rem 0;
+}
+
+.bubble small {
+  color: var(--muted);
+}
+
+.chat-input {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.chat-input input {
+  flex: 1;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) * 1.25);
+  padding: 14px 16px;
+  color: var(--text);
+}
+
+.chat-input button {
+  padding: 0 28px;
+  border-radius: calc(var(--radius) * 1.25);
+  background: var(--gradient);
+  color: var(--black);
+  box-shadow: 0 10px 24px rgba(255, 45, 149, 0.18);
+}
+
+.message.sent {
+  grid-template-columns: 1fr auto;
+  justify-items: end;
+}
+
+.message.sent .bubble {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.thread-list-title {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .chatroom {
