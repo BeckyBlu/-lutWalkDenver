@@ -1,15 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '../../../../lib/firebase-admin';
-import { verifyToken } from '../../../../lib/auth';
-import { cookies } from 'next/headers';
+import { requireAdmin, requireMemberOrAdmin } from '../../../../lib/authz';
 import { FieldValue } from 'firebase-admin/firestore';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function DELETE(_request: Request, context: RouteContext) {
-  const cookieStore = await cookies();
-  const adminToken = cookieStore.get('sw_admin')?.value;
-  if (!adminToken || !verifyToken(adminToken)) {
+  if (!(await requireAdmin())) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -25,9 +22,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const cookieStore = await cookies();
-  const adminToken = cookieStore.get('sw_admin')?.value;
-  if (!adminToken || !verifyToken(adminToken)) {
+  if (!(await requireAdmin())) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -45,14 +40,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
 export async function POST(request: Request, context: RouteContext) {
   // React handler for emoji reactions: POST /api/posts/[id] { reaction: "👍" }
-  const cookieStore = await cookies();
-  const memberToken = cookieStore.get('sw_auth')?.value;
-  const adminToken = cookieStore.get('sw_admin')?.value;
-  const isAuthorized =
-    (memberToken && verifyToken(memberToken)) ||
-    (adminToken && verifyToken(adminToken));
-
-  if (!isAuthorized) {
+  if (!(await requireMemberOrAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

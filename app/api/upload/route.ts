@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAdminStorage } from '../../../lib/firebase-admin';
-import { verifyToken } from '../../../lib/auth';
-import { cookies } from 'next/headers';
+import { getServerSession } from '../../../lib/authz';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_TYPES = new Set([
@@ -13,14 +12,8 @@ const ALLOWED_TYPES = new Set([
 ]);
 
 export async function POST(request: Request) {
-  const cookieStore = await cookies();
-  const memberToken = cookieStore.get('sw_auth')?.value;
-  const adminToken = cookieStore.get('sw_admin')?.value;
-  const isAuthorized =
-    (memberToken && verifyToken(memberToken)) ||
-    (adminToken && verifyToken(adminToken));
-
-  if (!isAuthorized) {
+  const session = await getServerSession();
+  if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -40,7 +33,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unsupported file type' }, { status: 415 });
     }
 
-    const folder = (formData.get('folder') as string | null) ?? 'uploads';
+    const requestedFolder = (formData.get('folder') as string | null) ?? 'bulletin';
+    const folder = requestedFolder.replace(/[^a-zA-Z0-9/_-]/g, '').replace(/^\/+/, '') || 'bulletin';
+    const adminOnlyFolders = new Set(['archive', 'community', 'products']);
+
+    if (adminOnlyFolders.has(folder.split('/')[0] ?? '') && session.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden — admin access required for this upload folder' }, { status: 403 });
+    }
     const safeName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
     const storagePath = `${folder}/${safeName}`;
 

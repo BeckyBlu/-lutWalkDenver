@@ -15,13 +15,19 @@ const AUTH_REQUIRED_PATHS = [
 
 const ADMIN_PATHS = ['/admin'];
 
+async function tokenHasRole(token: string | undefined, role: 'member' | 'admin') {
+  if (!token) return false;
+  const claims = await verifyTokenEdge(token);
+  return claims?.sub === role;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Admin-only routes: require the sw_admin cookie
   if (ADMIN_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
     const adminToken = request.cookies.get('sw_admin')?.value;
-    if (!adminToken || !(await verifyTokenEdge(adminToken))) {
+    if (!(await tokenHasRole(adminToken, 'admin'))) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = '/admin-login';
       return NextResponse.redirect(redirectUrl);
@@ -33,8 +39,8 @@ export async function middleware(request: NextRequest) {
     const memberToken = request.cookies.get('sw_auth')?.value;
     const adminToken = request.cookies.get('sw_admin')?.value;
     const isAuthorized =
-      (memberToken && (await verifyTokenEdge(memberToken))) ||
-      (adminToken && (await verifyTokenEdge(adminToken)));
+      (await tokenHasRole(memberToken, 'member')) ||
+      (await tokenHasRole(adminToken, 'admin'));
 
     if (!isAuthorized) {
       const redirectUrl = request.nextUrl.clone();

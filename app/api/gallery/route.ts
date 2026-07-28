@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '../../../lib/firebase-admin';
-import { verifyToken } from '../../../lib/auth';
+import { requireAdmin, requireMemberOrAdmin } from '../../../lib/authz';
 
 type GalleryCollection = 'archive' | 'community';
 type GalleryCategory = 'photos' | 'flyers' | 'press' | 'zines' | 'general';
@@ -17,26 +16,8 @@ type GalleryAssetRecord = {
   createdAt?: unknown;
 };
 
-function getTokens() {
-  return cookies().then((cookieStore) => ({
-    memberToken: cookieStore.get('sw_auth')?.value,
-    adminToken: cookieStore.get('sw_admin')?.value,
-  }));
-}
-
-function isMemberOrAdmin(memberToken?: string, adminToken?: string) {
-  const memberValid = typeof memberToken === 'string' && verifyToken(memberToken) !== null;
-  const adminValid = typeof adminToken === 'string' && verifyToken(adminToken) !== null;
-  return memberValid || adminValid;
-}
-
-function isAdmin(adminToken?: string) {
-  return typeof adminToken === 'string' && verifyToken(adminToken) !== null;
-}
-
 export async function GET(request: Request) {
-  const { memberToken, adminToken } = await getTokens();
-  if (!isMemberOrAdmin(memberToken, adminToken)) {
+  if (!(await requireMemberOrAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -66,8 +47,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { adminToken } = await getTokens();
-  if (!isAdmin(adminToken)) {
+  if (!(await requireAdmin())) {
     return NextResponse.json({ error: 'Forbidden — admin access required' }, { status: 403 });
   }
 

@@ -1,20 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '../../../../../lib/firebase-admin';
-import { verifyToken } from '../../../../../lib/auth';
-import { cookies } from 'next/headers';
+import { requireMemberOrAdmin } from '../../../../../lib/authz';
 import { FieldValue } from 'firebase-admin/firestore';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(_request: Request, context: RouteContext) {
-  const cookieStore = await cookies();
-  const memberToken = cookieStore.get('sw_auth')?.value;
-  const adminToken = cookieStore.get('sw_admin')?.value;
-  const isAuthorized =
-    (memberToken && verifyToken(memberToken)) ||
-    (adminToken && verifyToken(adminToken));
-
-  if (!isAuthorized) {
+  if (!(await requireMemberOrAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
