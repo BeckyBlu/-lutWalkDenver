@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const PROTECTED_PATHS = [
-  '/admin-login',
   '/archive',
   '/bulletin',
   '/calendar',
@@ -29,5 +28,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin-login/:path*', '/archive/:path*', '/bulletin/:path*', '/calendar/:path*', '/community/:path*', '/events/:path*', '/shop/:path*', '/zines/:path*'],
+  matcher: ['/archive/:path*', '/bulletin/:path*', '/calendar/:path*', '/community/:path*', '/events/:path*', '/shop/:path*', '/zines/:path*'],
 };

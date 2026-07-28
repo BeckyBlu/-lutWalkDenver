@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Login | SlutWalk Denver</title>
     <meta name="description" content="Administrator login for SlutWalk Denver." />
-    <script src="static/js/auth-guard.js"></script>
     <link rel="stylesheet" href="styles.css" />
+    <script>window.SW_FALLBACK_PASSWORD = 'Organizer2026!';</script>
+    <script src="/static/js/gate.js" defer></script>
   </head>
   <body>
     <main class="shell">
@@ -38,6 +39,32 @@
           </div>
           <p class="helper">Administrator access is protected by a separate password.</p>
         </form>
+      </section>
+
+      <section class="content content--locked">
+        <p class="eyebrow">Admin workspace</p>
+        <h2>Data and calendar editing</h2>
+        <p>Use this space to draft updates before publishing them into the public pages.</p>
+
+        <div class="notice-grid">
+          <article>
+            <h3>Data editor</h3>
+            <label for="admin-notes">Draft notes</label>
+            <textarea id="admin-notes" rows="6" placeholder="Write internal notes or updates..."></textarea>
+            <button type="button">Save draft</button>
+          </article>
+
+          <article>
+            <h3>Calendar editor</h3>
+            <label for="admin-event-title">Event title</label>
+            <input id="admin-event-title" type="text" placeholder="Volunteer orientation" />
+            <label for="admin-event-time">Event time</label>
+            <input id="admin-event-time" type="text" placeholder="Sunday • 4:00 PM" />
+            <label for="admin-event-notes">Event notes</label>
+            <textarea id="admin-event-notes" rows="6" placeholder="Add description or reminders..."></textarea>
+            <button type="button">Preview update</button>
+          </article>
+        </div>
       </section>
     </main>
   </body>
