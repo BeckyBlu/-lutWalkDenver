@@ -11,9 +11,10 @@ export default function ZinesPage() {
           <ul>
             <li><Link href="/">Home</Link></li>
             <li><Link href="/about">About</Link></li>
-            <li><Link href="/archive">Archive</Link></li>
-            <li><Link href="/events">Events</Link></li>
-            <li><Link href="/community">Community</Link></li>
+            <li><Link href="/shop">Store</Link></li>
+            <li><Link href="/bulletin">Bulletin</Link></li>
+            <li><Link href="/calendar">Calendar</Link></li>
+            <li><Link href="/admin-login">Admin</Link></li>
           </ul>
         </nav>
         <div className="hero-overlay">

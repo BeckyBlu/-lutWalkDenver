@@ -6,36 +6,37 @@ This repository contains two aligned implementations of the same SlutWalk Denver
 - A static landing page at the repository root for GitHub Pages
 - A Next.js app-router version under app/
 
-Both versions share the same structure, copy, and visual language so the published Pages site and the React version stay in sync.
+Both versions share the same visual language, member access flow, and community-focused structure.
 
 ## Experience
 
 The site now includes:
 
 - A full-screen hero for SlutWalk Denver
-- A member access gate for the private community space
-- A featured campaign section centered on the next organizing circle
-- A movement timeline with the years 2011, 2020, 2021, and 2022
-- Zine spotlights, event listings, a community bulletin board, a member chatroom, and archive sections
+- A shared member access gate that unlocks the protected dashboard
+- A public landing section that explains the collective and directs visitors into the community space
+- A protected dashboard with timeline, zine, event, bulletin, chat, and archive sections
+- Separate administrator access for organizers
 
 ## Access
 
-- Members enter through a shared access password defined in the static page and the React page.
-- A successful entry stores access in browser storage so the protected content remains available on return visits.
+- Members enter through a shared password defined in both the static page and the React page.
+- Administrators use a different password for the portal experience.
+- Successful entry stores access in browser storage so the protected content remains available on return visits.
 
 ## Content Notes
 
 - The experience centers survivor-led organizing, digital archives, community education, and feminist media.
-- The hero headline is: Reclaiming Space. Building Community. Ending Victim Blaming.
-- The featured section now invites visitors to join the next organizing circle and support community action.
-- The protected area is presented as a community space rather than a placeholder layout.
+- The hero headline is: $lutWalk Denver is a living collective.
+- The protected area is presented as a community hub rather than a placeholder layout.
 
 ## Implementation
 
 ### Root static site
 
 - [index.html](index.html) is the published landing page for GitHub Pages.
-- [styles.css](styles.css) provides the shared visual system for that static site.
+- [styles.css](styles.css) provides the shared visual system for the static pages.
+- The additional static pages include [about.html](about.html), [shop.html](shop.html), [bulletin.html](bulletin.html), [calendar.html](calendar.html), and [admin-login.html](admin-login.html).
 
 ### Next.js app
 
@@ -61,6 +62,6 @@ The site now includes:
 
 ## Notes
 
-- The static and Next versions are intentionally similar, while remaining implemented differently.
+- The static and Next versions are intentionally similar while remaining implemented differently.
 - The static page uses inline script for the access gate, while the React version handles it in component state.
 - The styling is built around a dark, neon-punk palette that can be extended with additional media later.

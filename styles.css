@@ -157,6 +157,13 @@ label {
   font-family: "Trebuchet MS", sans-serif;
 }
 
+.btn-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .btn {
   display: inline-block;
   padding: 14px 28px;
@@ -171,6 +178,13 @@ label {
 
 .btn:hover {
   transform: scale(1.08);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text);
+  box-shadow: none;
 }
 
 .eyebrow {
@@ -256,7 +270,9 @@ button {
 .zines,
 .events,
 .community-board,
-.archive {
+.archive,
+.notice-grid,
+.dashboard-grid {
   display: grid;
   gap: 20px;
 }
@@ -281,14 +297,18 @@ button {
 
 .events,
 .community-board,
-.archive {
+.archive,
+.notice-grid,
+.dashboard-grid {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
 .events article,
 .community-board article,
 .chatroom article,
-.archive article {
+.archive article,
+.notice-grid article,
+.dashboard-card {
   padding: 2rem;
 }
 
@@ -301,6 +321,21 @@ button {
   display: grid;
   align-content: start;
   gap: 12px;
+}
+
+.dashboard-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--panel), rgba(255, 248, 240, 0.04));
+  color: var(--text);
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
 }
 
 img {
@@ -338,7 +373,9 @@ li + li {
   .zines,
   .events,
   .community-board,
-  .archive {
+  .archive,
+  .notice-grid,
+  .dashboard-grid {
     grid-template-columns: 1fr;
   }
 }

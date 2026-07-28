@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-export default function EventsPage() {
+export default function CalendarPage() {
   return (
     <main className="shell">
       <header className="hero">
@@ -13,22 +13,18 @@ export default function EventsPage() {
             <li><Link href="/about">About</Link></li>
             <li><Link href="/shop">Store</Link></li>
             <li><Link href="/bulletin">Bulletin</Link></li>
-            <li><Link href="/calendar">Calendar</Link></li>
             <li><Link href="/admin-login">Admin</Link></li>
           </ul>
         </nav>
         <div className="hero-overlay">
-          <p className="eyebrow">Events</p>
-          <h1>Gatherings, circles, and public action.</h1>
-          <p>
-            Join upcoming volunteer orientation, solidarity rallies, and community
-            planning sessions.
-          </p>
+          <p className="eyebrow">Community calendar</p>
+          <h1>Meetings, workshops, rallies, and volunteer shifts.</h1>
+          <p>The calendar page is designed as a future-ready hub for events and reminders.</p>
         </div>
       </header>
 
       <section className="featured">
-        <h2>Upcoming gatherings</h2>
+        <h2>Upcoming events</h2>
         <div className="events">
           <article>
             <h3>Volunteer orientation</h3>

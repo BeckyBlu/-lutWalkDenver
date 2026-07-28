@@ -26,7 +26,7 @@
         if (form && input && button) {
           input.disabled = isUnlocked;
           button.disabled = isUnlocked;
-          button.textContent = isUnlocked ? 'Unlocked' : 'Enter site';
+          button.textContent = isUnlocked ? 'Unlocked' : 'Enter community';
         }
       }
 
@@ -64,34 +64,32 @@
 
           <ul>
             <li><a href="about.html">About</a></li>
-            <li><a href="archive.html">Archive</a></li>
-            <li><a href="events.html">Events</a></li>
-            <li><a href="zines.html">Zines</a></li>
-            <li><a href="community.html">Community</a></li>
+            <li><a href="shop.html">Store</a></li>
+            <li><a href="bulletin.html">Bulletin</a></li>
+            <li><a href="calendar.html">Calendar</a></li>
+            <li><a href="admin-login.html">Admin</a></li>
           </ul>
         </nav>
 
         <div class="hero-overlay">
-          <h1>
-            Reclaiming Space.
-            Building Community.
-            Ending Victim Blaming.
-          </h1>
+          <p class="eyebrow">Community hub</p>
+          <h1>$lutWalk Denver is a living collective.</h1>
 
           <p>
-            Survivor-led organizing, digital archives, community education, and
-            feminist media.
+            A public landing page for community information, a protected member dashboard,
+            and a separate administrator portal for organizers.
           </p>
 
-          <a class="btn" href="#login">
-            Become a Member
-          </a>
+          <div class="btn-row">
+            <a class="btn" href="#login">Unlock member space</a>
+            <a class="btn btn-secondary" href="admin-login.html">Administrator portal</a>
+          </div>
         </div>
       </header>
 
       <section id="login" class="login-card">
         <p class="eyebrow">Members only</p>
-        <h2>Access the community space</h2>
+        <h2>Enter the shared community password</h2>
         <form class="gate-form" onsubmit="handleSubmit(event)">
           <label for="password">Access password</label>
           <div class="form-row">
@@ -103,17 +101,27 @@
             />
             <button type="submit">Enter community</button>
           </div>
-          <p class="helper">Use the password shared with members to enter the private community space.</p>
+          <p class="helper">Members enter the shared password to unlock the dashboard.</p>
         </form>
       </section>
 
       <section class="featured">
-        <p class="eyebrow">Featured campaign</p>
-        <h2>Join the next organizing circle.</h2>
+        <p class="eyebrow">Public landing page</p>
+        <h2>Built for organizing, education, and collective care.</h2>
         <p>
-          Help build the next action, share resources, and support survivor-led
-          organizing in Denver.
+          This landing view welcomes new visitors, shares community information,
+          and directs members into the protected pages for organizing and resource sharing.
         </p>
+        <div class="notice-grid">
+          <article>
+            <h3>Accessibility statement</h3>
+            <p>Keyboard-friendly navigation, strong contrast, and clear structure support inclusive access.</p>
+          </article>
+          <article>
+            <h3>Privacy notice</h3>
+            <p>Member access is stored locally in the browser for this prototype and can be cleared at any time.</p>
+          </article>
+        </div>
       </section>
 
       <section class="content content--locked">
