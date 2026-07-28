@@ -4,7 +4,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'SlutWalk Denver',
-  description: 'A matching prototype and starter for SlutWalk Denver.',
+  description: 'A survivor-led community space for SlutWalk Denver.',
 };
 
 export default function RootLayout({
