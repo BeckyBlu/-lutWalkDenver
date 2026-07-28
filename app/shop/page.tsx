@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState, useCallback } from 'react';
-import { useCart } from '../context/CartContext';
+
+const DONATE_URL = 'https://rougesupportnetwork.org';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -33,11 +34,7 @@ const CATEGORIES = ['all', 'apparel', 'stickers', 'zines', 'posters', 'books', '
 export default function ShopPage() {
   const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
   const [category, setCategory] = useState('all');
-  const [cartOpen, setCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [checkoutError, setCheckoutError] = useState('');
-  const { items, addItem, updateQuantity, removeItem, totalItems, totalCents } = useCart();
 
   // ── Load products ──────────────────────────────────────────────────────────
 
@@ -61,33 +58,6 @@ export default function ShopPage() {
 
   const visible = products.filter((p) => category === 'all' || p.category === category);
 
-  // ── Checkout ──────────────────────────────────────────────────────────────
-
-  const checkout = async () => {
-    if (items.length === 0) return;
-    setCheckoutLoading(true);
-    setCheckoutError('');
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ items }),
-      });
-      if (res.ok) {
-        const json = await res.json() as { url?: string };
-        if (json.url) {
-          window.location.href = json.url;
-          return;
-        }
-      }
-      setCheckoutError('Checkout is not available. Please contact an organizer.');
-    } catch {
-      setCheckoutError('Checkout is not available. Please contact an organizer.');
-    }
-    setCheckoutLoading(false);
-  };
-
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
@@ -102,19 +72,17 @@ export default function ShopPage() {
             <li><Link href="/calendar">Calendar</Link></li>
             <li><Link href="/admin-login">Admin</Link></li>
           </ul>
-          <button
-            type="button"
-            className="cart-btn"
-            onClick={() => setCartOpen(true)}
-            aria-label={`Open cart, ${totalItems} items`}
-          >
-            🛒 {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
-          </button>
         </nav>
         <div className="hero-overlay">
           <p className="eyebrow">Community store</p>
           <h1>Support the work through education and merch.</h1>
-          <p>Every purchase directly supports SlutWalk Denver organizing and community care.</p>
+          <p>
+            Zine PDFs are available when you donate to{' '}
+            <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" className="link--inline">
+              Rouge Support Network
+            </a>
+            , our non-profit partner. Every contribution supports survivor care.
+          </p>
         </div>
       </header>
 
@@ -166,24 +134,17 @@ export default function ShopPage() {
                     {product.name}
                   </button>
                 </h3>
-                <p className="product-price">${(product.price / 100).toFixed(2)}</p>
-                {product.stock === 0 ? (
-                  <p className="out-of-stock">Out of stock</p>
-                ) : (
-                  <button
-                    type="button"
+                {product.category === 'zines' ? (
+                  <a
+                    href={DONATE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="btn"
-                    onClick={() =>
-                      addItem({
-                        productId: product.id,
-                        name: product.name,
-                        price: product.price,
-                        imageUrl: product.imageUrl,
-                      })
-                    }
                   >
-                    Add to cart
-                  </button>
+                    Donate to download PDF →
+                  </a>
+                ) : (
+                  <p className="helper">Contact an organizer to order.</p>
                 )}
               </div>
             </article>
@@ -191,62 +152,6 @@ export default function ShopPage() {
           {visible.length === 0 && <p>No products in this category yet.</p>}
         </div>
       </section>
-
-      {/* Cart drawer */}
-      {cartOpen && (
-        <div
-          className="drawer-backdrop"
-          onClick={(e) => { if (e.target === e.currentTarget) setCartOpen(false); }}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Shopping cart"
-        >
-          <div className="drawer">
-            <div className="drawer-header">
-              <h2>Your Cart</h2>
-              <button type="button" className="modal-close" onClick={() => setCartOpen(false)} aria-label="Close cart">✕</button>
-            </div>
-
-            {items.length === 0 ? (
-              <p className="drawer-empty">Your cart is empty.</p>
-            ) : (
-              <>
-                <ul className="cart-list">
-                  {items.map((item) => (
-                    <li key={item.productId} className="cart-item">
-                      <div className="cart-item-name">{item.name}</div>
-                      <div className="cart-item-controls">
-                        <button type="button" onClick={() => updateQuantity(item.productId, item.quantity - 1)} aria-label="Decrease quantity">−</button>
-                        <span>{item.quantity}</span>
-                        <button type="button" onClick={() => updateQuantity(item.productId, item.quantity + 1)} aria-label="Increase quantity">+</button>
-                      </div>
-                      <div className="cart-item-price">${((item.price * item.quantity) / 100).toFixed(2)}</div>
-                      <button type="button" className="cart-item-remove" onClick={() => removeItem(item.productId)} aria-label={`Remove ${item.name}`}>✕</button>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="cart-total">
-                  <strong>Total: ${(totalCents / 100).toFixed(2)}</strong>
-                </div>
-
-                {checkoutError && <p className="helper" style={{ color: 'var(--hot-pink)' }}>{checkoutError}</p>}
-
-                <button
-                  type="button"
-                  className="btn"
-                  style={{ width: '100%', marginTop: '1rem' }}
-                  onClick={() => void checkout()}
-                  disabled={checkoutLoading}
-                  aria-busy={checkoutLoading}
-                >
-                  {checkoutLoading ? 'Loading…' : 'Checkout with Stripe'}
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Product detail modal */}
       {selectedProduct && (
@@ -265,19 +170,20 @@ export default function ShopPage() {
             <p className="eyebrow">{selectedProduct.category}</p>
             <h2>{selectedProduct.name}</h2>
             <p>{selectedProduct.description}</p>
-            <p className="product-price">${(selectedProduct.price / 100).toFixed(2)}</p>
-            {selectedProduct.stock > 0 && (
-              <button
-                type="button"
+            {selectedProduct.category === 'zines' ? (
+              <a
+                href={DONATE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn"
-                onClick={() => {
-                  addItem({ productId: selectedProduct.id, name: selectedProduct.name, price: selectedProduct.price, imageUrl: selectedProduct.imageUrl });
-                  setSelectedProduct(null);
-                  setCartOpen(true);
-                }}
+                style={{ display: 'inline-block', marginTop: '1rem' }}
               >
-                Add to cart
-              </button>
+                Donate to Rouge Support Network to download PDF →
+              </a>
+            ) : (
+              <p className="helper" style={{ marginTop: '1rem' }}>
+                Contact an organizer to order this item.
+              </p>
             )}
           </div>
         </div>

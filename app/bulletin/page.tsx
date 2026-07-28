@@ -2,16 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from 'react';
-import { getClientDb } from '../../lib/firebase-client';
-import {
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-  limit,
-  Timestamp,
-} from 'firebase/firestore';
+import { useEffect, useRef, useState, useCallback, type ChangeEvent, type KeyboardEvent } from 'react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -46,20 +37,12 @@ type Thread = {
 const REACTIONS = ['👍', '❤️', '✊', '🌹'];
 
 function formatTimestamp(value: unknown): string {
-  if (value instanceof Timestamp) {
-    return value.toDate().toLocaleString();
+  // Handles serialized Firestore admin Timestamps ({ _seconds, _nanoseconds })
+  if (value != null && typeof value === 'object' && '_seconds' in value) {
+    return new Date((value as { _seconds: number })._seconds * 1000).toLocaleString();
   }
   if (typeof value === 'string') return value;
   return new Date().toLocaleString();
-}
-
-function firestoreUnavailable(): boolean {
-  // Check all required client-side Firebase config values
-  return (
-    !process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
-    !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
-    !process.env.NEXT_PUBLIC_FIREBASE_APP_ID
-  );
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -91,62 +74,73 @@ export default function BulletinPage() {
     setIsAdmin(window.localStorage.getItem('slutwalk-admin-access') === 'true');
   }, []);
 
-  // ── Firestore real-time listeners ─────────────────────────────────────────
+  // ── Fetch messages and threads from the API ───────────────────────────────
+
+  const loadMessages = useCallback(async () => {
+    try {
+      const res = await fetch('/api/messages', { credentials: 'include' });
+      if (res.ok) {
+        const json = await res.json() as { messages?: { id: string; sender: string; text: string; time: string }[] };
+        if (Array.isArray(json.messages) && json.messages.length > 0) {
+          setMessages(json.messages);
+        }
+      }
+    } catch {
+      // Keep seed messages on failure
+    }
+  }, []);
+
+  const loadThreads = useCallback(async () => {
+    try {
+      const res = await fetch('/api/posts', { credentials: 'include' });
+      if (res.ok) {
+        const json = await res.json() as { posts?: Record<string, unknown>[] };
+        if (Array.isArray(json.posts) && json.posts.length > 0) {
+          setThreads(
+            json.posts.map((d) => ({
+              id: typeof d.id === 'string' ? d.id : String(Date.now()),
+              title: typeof d.title === 'string' ? d.title : '',
+              text: typeof d.text === 'string' ? d.text : '',
+              imageUrl: typeof d.imageUrl === 'string' ? d.imageUrl : null,
+              pinned: d.pinned === true,
+              reactions:
+                typeof d.reactions === 'object' && d.reactions !== null
+                  ? (d.reactions as Record<string, number>)
+                  : {},
+              replyCount: typeof d.replyCount === 'number' ? d.replyCount : 0,
+              createdAt: formatTimestamp(d.createdAt),
+            })),
+          );
+        }
+      }
+    } catch {
+      // Keep seed threads on failure
+    }
+  }, []);
+
+  // ── Poll for updates (replaces Firestore onSnapshot) ──────────────────────
   useEffect(() => {
-    if (firestoreUnavailable()) return;
+    void loadMessages();
+    void loadThreads();
 
-    const db = getClientDb();
+    const msgInterval = setInterval(() => { void loadMessages(); }, 5_000);
+    const threadInterval = setInterval(() => { void loadThreads(); }, 15_000);
 
-    // Chat messages
-    const msgQuery = query(
-      collection(db, 'messages'),
-      orderBy('createdAt', 'asc'),
-      limit(100),
-    );
-    const unsubMessages = onSnapshot(msgQuery, (snap) => {
-      const msgs: ChatMessage[] = snap.docs.map((doc) => {
-        const d = doc.data();
-        return {
-          id: doc.id,
-          sender: typeof d.sender === 'string' ? d.sender : 'Member',
-          text: typeof d.text === 'string' ? d.text : '',
-          time: formatTimestamp(d.createdAt),
-        };
-      });
-      setMessages(msgs);
-    });
-
-    // Bulletin threads
-    const threadQuery = query(
-      collection(db, 'posts'),
-      orderBy('pinned', 'desc'),
-      orderBy('createdAt', 'desc'),
-      limit(50),
-    );
-    const unsubThreads = onSnapshot(threadQuery, (snap) => {
-      const fetched: Thread[] = snap.docs.map((doc) => {
-        const d = doc.data();
-        return {
-          id: doc.id,
-          title: typeof d.title === 'string' ? d.title : '',
-          text: typeof d.text === 'string' ? d.text : '',
-          imageUrl: typeof d.imageUrl === 'string' ? d.imageUrl : null,
-          pinned: d.pinned === true,
-          reactions: typeof d.reactions === 'object' && d.reactions !== null
-            ? (d.reactions as Record<string, number>)
-            : {},
-          replyCount: typeof d.replyCount === 'number' ? d.replyCount : 0,
-          createdAt: formatTimestamp(d.createdAt),
-        };
-      });
-      setThreads(fetched);
-    });
+    // Pause polling while the tab is hidden; resume immediately on becoming visible.
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        void loadMessages();
+        void loadThreads();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
-      unsubMessages();
-      unsubThreads();
+      clearInterval(msgInterval);
+      clearInterval(threadInterval);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, []);
+  }, [loadMessages, loadThreads]);
 
   // ── Auto-scroll chat ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -160,7 +154,7 @@ export default function BulletinPage() {
     const text = chatInput.trim();
     if (!text) return;
 
-    // Optimistic local update while Firestore syncs (or if Firestore is absent)
+    // Optimistic local update
     const localMsg: ChatMessage = {
       id: String(Date.now()),
       sender: 'You',
@@ -171,18 +165,17 @@ export default function BulletinPage() {
     setMessages((prev) => [...prev, localMsg]);
     setChatInput('');
 
-    if (firestoreUnavailable()) return;
-
     try {
-      const { addDoc, serverTimestamp } = await import('firebase/firestore');
-      const db = getClientDb();
-      await addDoc(collection(db, 'messages'), {
-        sender: 'Member',
-        text,
-        createdAt: serverTimestamp(),
+      await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ text, sender: 'Member' }),
       });
+      // Refresh so the message shows with its server-side ID and timestamp
+      await loadMessages();
     } catch {
-      // Message already shown locally; silent failure in prototype
+      // Message already shown locally; silent failure
     }
   };
 
@@ -244,8 +237,11 @@ export default function BulletinPage() {
         body: JSON.stringify({ title, text, imageUrl }),
       });
 
-      if (!res.ok && firestoreUnavailable()) {
-        // Local fallback when Firebase is not configured
+      if (res.ok) {
+        // Refresh thread list to include the new post
+        await loadThreads();
+      } else {
+        // Local fallback when the API is unavailable
         setThreads((prev) => [
           {
             id: String(Date.now()),
@@ -260,7 +256,6 @@ export default function BulletinPage() {
           ...prev,
         ]);
       }
-      // If Firestore is live, onSnapshot will push the new thread automatically
     } catch {
       // Local fallback
       setThreads((prev) => [
