@@ -1,20 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
 
 const ACCESS_PASSWORD = 'GurlGang2030!';
-
-const boards = [
-  'Welcome thread for new members',
-  'Volunteer sign-up and planning',
-  'Photo post from the latest meetup',
-];
-
-const storeItems = [
-  'Event tee',
-  'Archived zine #04',
-  'Sticker pack',
-];
 
 export default function HomePage() {
   const [password, setPassword] = useState('');
@@ -24,7 +13,7 @@ export default function HomePage() {
     setUnlocked(window.localStorage.getItem('slutwalk-access') === 'true');
   }, []);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (password === ACCESS_PASSWORD) {
@@ -40,16 +29,40 @@ export default function HomePage() {
 
   return (
     <main className="shell">
-      <section className="gate-card">
-        <div>
-          <p className="eyebrow">Members only</p>
-          <h1>SlutWalk Denver Community Access</h1>
-          <p className="lede">
-            Enter with the shared password to reach the members-only space for
-            conversation, planning, events, and store access.
-          </p>
-        </div>
+      <header className="hero">
+        <nav>
+          <div className="logo">$lutWalk Denver</div>
 
+          <ul>
+            <li>About</li>
+            <li>Archive</li>
+            <li>Events</li>
+            <li>Zines</li>
+            <li>Community</li>
+          </ul>
+        </nav>
+
+        <div className="hero-overlay">
+          <h1>
+            Reclaiming Space.
+            Building Community.
+            Ending Victim Blaming.
+          </h1>
+
+          <p>
+            Survivor-led organizing, digital archives, community education, and
+            feminist media.
+          </p>
+
+          <a className="btn" href="#login">
+            Become a Member
+          </a>
+        </div>
+      </header>
+
+      <section id="login" className="login-card">
+        <p className="eyebrow">Members only</p>
+        <h2>Access the community space</h2>
         <form className="gate-form" onSubmit={handleSubmit}>
           <label htmlFor="password">Access password</label>
           <div className="form-row">
@@ -63,48 +76,95 @@ export default function HomePage() {
             />
             <button type="submit">Enter site</button>
           </div>
-          <p className="helper">Demo-only gate for the starter scaffold.</p>
+          <p className="helper">Demo-only gate for layout purposes.</p>
         </form>
       </section>
 
+      <section className="featured">
+        <p className="eyebrow">Featured campaign</p>
+        <h2>Center the current call to action here.</h2>
+        <p>
+          Use this area for a launch announcement, donation push, call for
+          volunteers, or the next public event.
+        </p>
+      </section>
+
       <section className={`content ${unlocked ? 'content--open' : 'content--locked'}`}>
-        <article className="feature-card">
-          <p className="eyebrow">Featured announcement</p>
-          <h2>Build a homepage that can grow into a community hub.</h2>
-          <p>
-            Swap this copy, add photography, and connect the cards below to real
-            content sources when you are ready.
-          </p>
+        <article className="timeline">
+          <article>
+            <h2>2011</h2>
+            <p>First Denver SlutWalk.</p>
+          </article>
+
+          <article>
+            <h2>2020</h2>
+            <p>Hybrid organizing and expanded inclusion.</p>
+          </article>
+
+          <article>
+            <h2>2021</h2>
+            <p>Carnival-style community rally.</p>
+          </article>
+
+          <article>
+            <h2>2022</h2>
+            <p>Archive and community media expansion.</p>
+          </article>
         </article>
 
-        <div className="grid">
-          <article className="panel">
-            <p className="eyebrow">Latest board activity</p>
-            <ul>
-              {boards.map((board) => (
-                <li key={board}>{board}</li>
-              ))}
-            </ul>
+        <section className="zines">
+          <article className="zine-card">
+            <p className="eyebrow">Zine spotlight</p>
+            <h3>Issue 01</h3>
+            <p>Feature a cover image, description, and archive details here.</p>
           </article>
 
-          <article className="panel">
-            <p className="eyebrow">Upcoming events</p>
-            <div className="mock-box">Calendar embed placeholder</div>
+          <article className="zine-card">
+            <p className="eyebrow">Zine spotlight</p>
+            <h3>Issue 02</h3>
+            <p>Feature a cover image, description, and archive details here.</p>
+          </article>
+        </section>
+
+        <section className="events">
+          <article>
+            <p className="eyebrow">Upcoming event</p>
+            <h3>Volunteer meeting</h3>
           </article>
 
-          <article className="panel panel--wide">
-            <p className="eyebrow">Featured merch and zines</p>
-            <div className="store-grid">
-              {storeItems.map((item) => (
-                <div className="product" key={item}>
-                  <div className="mock-box">Image</div>
-                  <h3>{item}</h3>
-                  <p>Use this block for price, stock, and short product copy.</p>
-                </div>
-              ))}
-            </div>
+          <article>
+            <p className="eyebrow">Upcoming event</p>
+            <h3>Community rally</h3>
           </article>
-        </div>
+        </section>
+
+        <section className="community-board">
+          <article>
+            <h3>Announcements</h3>
+          </article>
+
+          <article>
+            <h3>Discussion</h3>
+          </article>
+
+          <article>
+            <h3>Resources</h3>
+          </article>
+        </section>
+
+        <section className="archive">
+          <article>
+            <h3>Photo archive</h3>
+          </article>
+
+          <article>
+            <h3>Flyer archive</h3>
+          </article>
+
+          <article>
+            <h3>Press archive</h3>
+          </article>
+        </section>
       </section>
     </main>
   );
