@@ -168,6 +168,22 @@ export default function HomePage() {
           </Link>
         </div>
 
+        <aside className="notice-grid" style={{ marginTop: '2rem' }}>
+          <article>
+            <h3>🔒 Privacy-first access via I2P</h3>
+            <p>
+              For maximum privacy, access this community through our{' '}
+              <strong>I2P eepsite</strong>. Your IP address never reaches our
+              servers — traffic is routed through the I2P anonymity network end-to-end.
+              See{' '}
+              <a href="https://github.com/BeckyBlu/-lutWalkDenver/blob/main/i2p.md" target="_blank" rel="noopener noreferrer">
+                the I2P setup guide
+              </a>{' '}
+              for installation and connection instructions.
+            </p>
+          </article>
+        </aside>
+
         <section className="timeline">
           <article>
             <h2>2011</h2>
