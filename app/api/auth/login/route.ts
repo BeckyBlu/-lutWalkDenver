@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { signToken } from '../../../../lib/auth';
+import { getMemberPassword } from '../../../../lib/passwords';
 
 export async function POST(request: Request) {
   // CSRF: reject cross-origin requests that supply an Origin header
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
 
   try {
     const { password } = await request.json();
-    const memberPassword = process.env.MEMBER_PASSWORD;
+    const memberPassword = getMemberPassword();
 
     if (!memberPassword || password !== memberPassword) {
       return NextResponse.json({ ok: false, message: 'Unauthorized' }, { status: 401 });
