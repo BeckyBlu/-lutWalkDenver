@@ -54,6 +54,22 @@ The site now includes:
 - GitHub Pages serves the repository root so the site opens from [index.html](index.html).
 - npm run build validates the Next.js app and confirms the repository still compiles cleanly.
 
+## I2P Eepsite
+
+The site can be accessed inside the I2P anonymity network for members who need stronger operational security. See [i2p.md](i2p.md) for full setup instructions.
+
+| Address type | Address |
+|---|---|
+| Base32 (auto-generated) | *(published separately by organizers)* |
+| Vanity hostname | `slutwalkdenver.i2p` *(pending registration)* |
+
+**Privacy properties implemented:**
+
+- All Firestore reads/writes are server-side only — the browser never contacts Google directly.
+- Strict `Content-Security-Policy`, `X-Frame-Options: DENY`, and `Referrer-Policy: no-referrer` headers block external leaks.
+- All static HTML files carry an equivalent CSP meta tag for the GitHub Pages build.
+- No CDN fonts, analytics, or third-party scripts anywhere in the codebase.
+
 ## File Map
 
 - [index.html](index.html)
