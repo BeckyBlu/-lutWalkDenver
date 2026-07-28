@@ -54,7 +54,12 @@ function formatTimestamp(value: unknown): string {
 }
 
 function firestoreUnavailable(): boolean {
-  return !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  // Check all required client-side Firebase config values
+  return (
+    !process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
+    !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+    !process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+  );
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
