@@ -41,6 +41,15 @@ type Stats = {
   products: number;
 };
 
+type GalleryAsset = {
+  id: string;
+  title: string;
+  description: string;
+  collection: 'archive' | 'community';
+  category: 'photos' | 'flyers' | 'press' | 'zines' | 'general';
+  imageUrl: string;
+};
+
 // ── Component ──────────────────────────────────────────────────────────────
 
 export default function AdminDashboardPage() {
@@ -50,6 +59,7 @@ export default function AdminDashboardPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [events, setEvents] = useState<AdminEvent[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [galleryAssets, setGalleryAssets] = useState<GalleryAsset[]>([]);
 
   // Event form
   const [evtTitle, setEvtTitle] = useState('');
@@ -70,17 +80,21 @@ export default function AdminDashboardPage() {
 
   // Archive upload
   const [archiveFile, setArchiveFile] = useState<File | null>(null);
-  const [archiveFolder, setArchiveFolder] = useState('archive/photos');
+  const [archiveCollection, setArchiveCollection] = useState<'archive' | 'community'>('archive');
+  const [archiveCategory, setArchiveCategory] = useState<'photos' | 'flyers' | 'press' | 'zines' | 'general'>('photos');
+  const [archiveTitle, setArchiveTitle] = useState('');
+  const [archiveDescription, setArchiveDescription] = useState('');
   const [archiveStatus, setArchiveStatus] = useState('');
   const [archiveUrl, setArchiveUrl] = useState('');
 
   // ── Data fetching ────────────────────────────────────────────────────────
 
   const loadData = useCallback(async () => {
-    const [postsRes, eventsRes, productsRes] = await Promise.allSettled([
+    const [postsRes, eventsRes, productsRes, galleryRes] = await Promise.allSettled([
       fetch('/api/posts?limit=50', { credentials: 'include' }),
       fetch('/api/events?limit=50', { credentials: 'include' }),
       fetch('/api/products', { credentials: 'include' }),
+      fetch('/api/gallery?limit=80', { credentials: 'include' }),
     ]);
 
     if (postsRes.status === 'fulfilled' && postsRes.value.ok) {
@@ -100,6 +114,10 @@ export default function AdminDashboardPage() {
       const fetched = json.products ?? [];
       setProducts(fetched);
       setStats((s) => ({ ...s, products: fetched.length }));
+    }
+    if (galleryRes.status === 'fulfilled' && galleryRes.value.ok) {
+      const json = await galleryRes.value.json() as { assets?: GalleryAsset[] };
+      setGalleryAssets(json.assets ?? []);
     }
   }, []);
 
@@ -204,19 +222,53 @@ export default function AdminDashboardPage() {
   const uploadArchiveFile = async (e: FormEvent) => {
     e.preventDefault();
     if (!archiveFile) return;
+    const title = archiveTitle.trim();
+    if (!title) {
+      setArchiveStatus('Title is required');
+      return;
+    }
+
     setArchiveStatus('Uploading…');
     const form = new FormData();
     form.append('file', archiveFile);
-    form.append('folder', archiveFolder);
+    form.append('folder', `${archiveCollection}/${archiveCategory}`);
     const res = await fetch('/api/upload', { method: 'POST', credentials: 'include', body: form });
     if (res.ok) {
-      const json = await res.json() as { url?: string };
-      setArchiveUrl(json.url ?? '');
-      setArchiveStatus('Upload complete ✓');
-      setArchiveFile(null);
+      const json = await res.json() as { url?: string; path?: string };
+      const url = json.url ?? '';
+      setArchiveUrl(url);
+
+      const metaRes = await fetch('/api/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title,
+          description: archiveDescription,
+          collection: archiveCollection,
+          category: archiveCategory,
+          imageUrl: url,
+          storagePath: json.path ?? '',
+        }),
+      });
+
+      if (metaRes.ok) {
+        setArchiveStatus('Upload + gallery publish complete ✓');
+        setArchiveFile(null);
+        setArchiveTitle('');
+        setArchiveDescription('');
+        void loadData();
+      } else {
+        setArchiveStatus('Uploaded file, but failed to save gallery metadata');
+      }
     } else {
       setArchiveStatus('Upload failed');
     }
+  };
+
+  const deleteGalleryAsset = async (id: string) => {
+    setGalleryAssets((prev) => prev.filter((asset) => asset.id !== id));
+    await fetch(`/api/gallery/${id}`, { method: 'DELETE', credentials: 'include' });
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -449,12 +501,46 @@ export default function AdminDashboardPage() {
           <>
             <h2>Archive uploads</h2>
             <form className="admin-form" onSubmit={(e) => void uploadArchiveFile(e)}>
-              <label htmlFor="archive-folder">Folder</label>
-              <select id="archive-folder" value={archiveFolder} onChange={(e) => setArchiveFolder(e.target.value)} className="admin-select">
-                {['archive/photos', 'archive/flyers', 'archive/press', 'archive/zines'].map((f) => (
-                  <option key={f} value={f}>{f}</option>
+              <label htmlFor="archive-collection">Collection</label>
+              <select
+                id="archive-collection"
+                value={archiveCollection}
+                onChange={(e) => setArchiveCollection(e.target.value as 'archive' | 'community')}
+                className="admin-select"
+              >
+                {['archive', 'community'].map((collection) => (
+                  <option key={collection} value={collection}>{collection}</option>
                 ))}
               </select>
+
+              <label htmlFor="archive-category">Category</label>
+              <select
+                id="archive-category"
+                value={archiveCategory}
+                onChange={(e) => setArchiveCategory(e.target.value as 'photos' | 'flyers' | 'press' | 'zines' | 'general')}
+                className="admin-select"
+              >
+                {['photos', 'flyers', 'press', 'zines', 'general'].map((category) => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+
+              <label htmlFor="archive-title">Title</label>
+              <input
+                id="archive-title"
+                type="text"
+                value={archiveTitle}
+                onChange={(e) => setArchiveTitle(e.target.value)}
+                required
+              />
+
+              <label htmlFor="archive-description">Description</label>
+              <textarea
+                id="archive-description"
+                rows={3}
+                value={archiveDescription}
+                onChange={(e) => setArchiveDescription(e.target.value)}
+              />
 
               <label htmlFor="archive-file">File (image or PDF, max 10 MB)</label>
               <input
@@ -476,6 +562,32 @@ export default function AdminDashboardPage() {
                 </p>
               )}
             </form>
+
+            <h3>Published gallery assets</h3>
+            <div className="admin-list">
+              {galleryAssets.map((asset) => (
+                <article key={asset.id} className="admin-list-item">
+                  <div className="admin-list-meta">
+                    <strong>{asset.title}</strong>
+                    <span className="muted"> · {asset.collection}/{asset.category}</span>
+                  </div>
+                  <p className="admin-list-body">{asset.description}</p>
+                  {asset.imageUrl ? (
+                    <a href={asset.imageUrl} target="_blank" rel="noopener noreferrer">{asset.imageUrl}</a>
+                  ) : null}
+                  <div className="admin-list-actions">
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => void deleteGalleryAsset(asset.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </article>
+              ))}
+              {galleryAssets.length === 0 && <p>No gallery assets yet.</p>}
+            </div>
           </>
         )}
 

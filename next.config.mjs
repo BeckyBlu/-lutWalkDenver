@@ -1,5 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      { source: '/index.html', destination: '/', permanent: true },
+      { source: '/about.html', destination: '/about', permanent: true },
+      { source: '/bulletin.html', destination: '/bulletin', permanent: true },
+      { source: '/calendar.html', destination: '/calendar', permanent: true },
+      { source: '/community.html', destination: '/community', permanent: true },
+      { source: '/zine.html', destination: '/zines', permanent: true },
+      { source: '/admin-login.html', destination: '/admin-login', permanent: true },
+    ];
+  },
   async headers() {
     const csp = [
       "default-src 'self'",
