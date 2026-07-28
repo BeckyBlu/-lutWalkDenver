@@ -282,8 +282,20 @@ button {
 
 .events article,
 .community-board article,
+.chatroom article,
 .archive article {
   padding: 2rem;
+}
+
+.chatroom {
+  display: grid;
+}
+
+.chatroom article {
+  min-height: 220px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
 }
 
 img {
