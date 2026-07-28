@@ -33,6 +33,15 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 30,
     });
 
+    // Keep admin/member sessions isolated: member login clears any admin session.
+    response.cookies.set({
+      name: 'sw_admin',
+      value: '',
+      httpOnly: true,
+      path: '/',
+      maxAge: 0,
+    });
+
     return response;
   } catch {
     return NextResponse.json({ ok: false }, { status: 500 });
