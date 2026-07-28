@@ -61,6 +61,13 @@ The site now includes:
 - [package.json](package.json)
 - [tsconfig.json](tsconfig.json)
 
+## To-Do
+
+- Confirm the site flow: public landing → password entry → dashboard.
+- Keep the administrator portal as a separate admin password gateway, distinct from member login.
+- Add image upload support for community pages and shared asset galleries.
+- Test the static `community.html` page and verify it renders correctly in the public landing flow.
+
 ## Notes
 
 - The static and Next versions are intentionally similar while remaining implemented differently.
