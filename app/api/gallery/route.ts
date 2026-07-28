@@ -25,11 +25,13 @@ function getTokens() {
 }
 
 function isMemberOrAdmin(memberToken?: string, adminToken?: string) {
-  return (memberToken && verifyToken(memberToken)) || (adminToken && verifyToken(adminToken));
+  const memberValid = typeof memberToken === 'string' && verifyToken(memberToken) !== null;
+  const adminValid = typeof adminToken === 'string' && verifyToken(adminToken) !== null;
+  return memberValid || adminValid;
 }
 
 function isAdmin(adminToken?: string) {
-  return adminToken && verifyToken(adminToken);
+  return typeof adminToken === 'string' && verifyToken(adminToken) !== null;
 }
 
 export async function GET(request: Request) {
