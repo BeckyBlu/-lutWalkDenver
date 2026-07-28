@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: 'SlutWalk Denver',
-  description: 'Password-gated community prototype for SlutWalk Denver.',
+  description: 'A matching prototype and starter for SlutWalk Denver.',
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en">
