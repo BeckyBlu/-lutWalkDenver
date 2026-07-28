@@ -1,0 +1,37 @@
+{
+  "name": "SlutWalk Denver",
+  "short_name": "$lutWalk",
+  "description": "A survivor-led community space for SlutWalk Denver.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#120f13",
+  "theme_color": "#120f13",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Bulletin Board",
+      "url": "/bulletin",
+      "description": "Community announcements and discussion"
+    },
+    {
+      "name": "Calendar",
+      "url": "/calendar",
+      "description": "Upcoming events and workshops"
+    }
+  ]
+}
