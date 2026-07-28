@@ -6,6 +6,16 @@ import { verifyToken } from '../../../lib/auth';
 
 type GalleryCollection = 'archive' | 'community';
 type GalleryCategory = 'photos' | 'flyers' | 'press' | 'zines' | 'general';
+type GalleryAssetRecord = {
+  id: string;
+  title?: string;
+  description?: string;
+  collection?: string;
+  category?: string;
+  imageUrl?: string;
+  storagePath?: string;
+  createdAt?: unknown;
+};
 
 function getTokens() {
   return cookies().then((cookieStore) => ({
@@ -39,7 +49,7 @@ export async function GET(request: Request) {
     const snap = await db.collection('galleryAssets').orderBy('createdAt', 'desc').limit(limit).get();
 
     const assets = snap.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .map((doc) => ({ id: doc.id, ...doc.data() }) as GalleryAssetRecord)
       .filter((asset) => {
         if (collectionFilter && asset.collection !== collectionFilter) return false;
         if (categoryFilter && asset.category !== categoryFilter) return false;
