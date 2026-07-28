@@ -15,6 +15,7 @@ The site now includes:
 - A full-screen hero for SlutWalk Denver
 - A shared member access gate that unlocks the protected dashboard
 - A public landing section that explains the collective and directs visitors into the community space
+- An About section embedded on the homepage, with [about.html](about.html) redirecting back to [index.html](index.html#about)
 - A protected dashboard with timeline, zine, event, bulletin, chat, and archive sections
 - Separate administrator access for organizers
 
@@ -36,7 +37,9 @@ The site now includes:
 
 - [index.html](index.html) is the published landing page for GitHub Pages.
 - [styles.css](styles.css) provides the shared visual system for the static pages.
-- The additional static pages include [about.html](about.html), [shop.html](shop.html), [bulletin.html](bulletin.html), [calendar.html](calendar.html), and [admin-login.html](admin-login.html).
+- The additional static pages include [shop.html](shop.html), [bulletin.html](bulletin.html), [calendar.html](calendar.html), and [admin-login.html](admin-login.html).
+- [about.html](about.html) now redirects to the About section on [index.html](index.html#about).
+- Static member/admin pages load [static/js/auth-guard.js](static/js/auth-guard.js) so the current gate behavior stays centralized.
 
 ### Next.js app
 
@@ -66,10 +69,10 @@ The site now includes:
 - Confirm the site flow: public landing → password entry → dashboard.
 - Keep the administrator portal as a separate admin password gateway, distinct from member login.
 - Add image upload support for community pages and shared asset galleries.
-- Test the static `community.html` page and verify it renders correctly in the public landing flow.
+- Decide whether the GitHub Pages fallback should remain; if not, fold the remaining static pages into the app-router experience.
 
 ## Notes
 
 - The static and Next versions are intentionally similar while remaining implemented differently.
-- The static page uses inline script for the access gate, while the React version handles it in component state.
+- The static pages share an external auth guard script, while the React version handles access in component state.
 - The styling is built around a dark, neon-punk palette that can be extended with additional media later.

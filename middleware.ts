@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const PROTECTED_PATHS = ['/about', '/bulletin', '/calendar', '/community', '/events', '/shop', '/zines'];
+const PROTECTED_PATHS = [
+  '/admin-login',
+  '/archive',
+  '/bulletin',
+  '/calendar',
+  '/community',
+  '/events',
+  '/shop',
+  '/zines',
+];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -20,5 +29,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/about/:path*', '/bulletin/:path*', '/calendar/:path*', '/community/:path*', '/events/:path*', '/shop/:path*', '/zines/:path*'],
+  matcher: ['/admin-login/:path*', '/archive/:path*', '/bulletin/:path*', '/calendar/:path*', '/community/:path*', '/events/:path*', '/shop/:path*', '/zines/:path*'],
 };
