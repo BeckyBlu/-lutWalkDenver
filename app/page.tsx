@@ -71,21 +71,21 @@ export default function HomePage() {
               name="password"
               type="password"
               value={password}
-              placeholder="***REMOVED***"
+              placeholder="Enter access password"
               onChange={(event) => setPassword(event.target.value)}
             />
-            <button type="submit">Enter site</button>
+            <button type="submit">Enter community</button>
           </div>
-          <p className="helper">Demo-only gate for layout purposes.</p>
+          <p className="helper">Use the password shared with members to enter the private community space.</p>
         </form>
       </section>
 
       <section className="featured">
         <p className="eyebrow">Featured campaign</p>
-        <h2>Center the current call to action here.</h2>
+        <h2>Join the next organizing circle.</h2>
         <p>
-          Use this area for a launch announcement, donation push, call for
-          volunteers, or the next public event.
+          Help build the next action, share resources, and support survivor-led
+          organizing in Denver.
         </p>
       </section>
 
@@ -116,25 +116,27 @@ export default function HomePage() {
           <article className="zine-card">
             <p className="eyebrow">Zine spotlight</p>
             <h3>Issue 01</h3>
-            <p>Feature a cover image, description, and archive details here.</p>
+            <p>Reclaiming the street through stories, art, and collective memory.</p>
           </article>
 
           <article className="zine-card">
             <p className="eyebrow">Zine spotlight</p>
             <h3>Issue 02</h3>
-            <p>Feature a cover image, description, and archive details here.</p>
+            <p>Survivor testimony, media strategy, and tools for solidarity.</p>
           </article>
         </section>
 
         <section className="events">
           <article>
             <p className="eyebrow">Upcoming event</p>
-            <h3>Volunteer meeting</h3>
+            <h3>Volunteer orientation</h3>
+            <p>Sunday • 4:00 PM • Planning circle and resource sharing.</p>
           </article>
 
           <article>
             <p className="eyebrow">Upcoming event</p>
-            <h3>Community rally</h3>
+            <h3>Solidarity rally</h3>
+            <p>Saturday • 11:00 AM • Public gathering and outreach.</p>
           </article>
         </section>
 
@@ -166,14 +168,17 @@ export default function HomePage() {
         <section className="archive">
           <article>
             <h3>Photo archive</h3>
+            <p>Images from past actions, marches, and community gatherings.</p>
           </article>
 
           <article>
             <h3>Flyer archive</h3>
+            <p>Historic posters, event notices, and call-to-action graphics.</p>
           </article>
 
           <article>
             <h3>Press archive</h3>
+            <p>Media coverage, interviews, and public statements.</p>
           </article>
         </section>
       </section>
