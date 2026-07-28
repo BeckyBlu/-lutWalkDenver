@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import './globals.css';
-import { CartProvider } from './context/CartContext';
 
 export const metadata: Metadata = {
   title: 'SlutWalk Denver',
@@ -24,7 +23,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body>
-        <CartProvider>{children}</CartProvider>
+        {children}
       </body>
     </html>
   );
