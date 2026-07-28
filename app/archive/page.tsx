@@ -90,10 +90,11 @@ export default function ArchivePage() {
       </section>
 
       {ARCHIVE_CATEGORIES.map((category) => {
-        const categoryAssets = groupedAssets.get(category ?? 'general') ?? [];
+        const categoryName = category ?? 'general';
+        const categoryAssets = groupedAssets.get(categoryName) ?? [];
         return (
-          <section className="featured" key={category}>
-            <h2>{(category ?? 'general').charAt(0).toUpperCase() + (category ?? 'general').slice(1)}</h2>
+          <section className="featured" key={categoryName}>
+            <h2>{categoryName.charAt(0).toUpperCase() + categoryName.slice(1)}</h2>
             {categoryAssets.length === 0 ? (
               <p className="helper">No uploaded items in this collection yet.</p>
             ) : (
