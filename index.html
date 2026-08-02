@@ -105,8 +105,9 @@
 
       .shell {
         display: grid;
+        gap: 24px;
         min-height: 100vh;
-        place-items: center;
+        justify-items: center;
         padding: 32px;
       }
 
@@ -220,6 +221,64 @@
         background: transparent;
         box-shadow: none;
       }
+
+      .community-section {
+        width: min(100%, 1100px);
+        padding: clamp(24px, 4vw, 36px);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(255, 248, 240, 0.12), rgba(255, 248, 240, 0.05));
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        display: grid;
+        gap: 20px;
+      }
+
+      .section-heading {
+        display: grid;
+        gap: 10px;
+        justify-items: center;
+        text-align: center;
+      }
+
+      .section-heading h2 {
+        margin: 0;
+        font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+        line-height: 1.2;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(255, 248, 240, 0.1), rgba(255, 248, 240, 0.04));
+        display: grid;
+        gap: 10px;
+        min-height: 190px;
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 1rem;
+        letter-spacing: 0.14em;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      @media (max-width: 760px) {
+        .cards {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
   <body>
@@ -258,6 +317,28 @@
               <a class="btn" href="/">Enter community hub</a>
               <a class="btn btn-secondary" href="/admin-login">Administrator portal</a>
             </div>
+          </div>
+        </section>
+
+        <section class="community-section" aria-labelledby="community-areas-title">
+          <div class="section-heading">
+            <p class="eyebrow">Community spaces</p>
+            <h2 id="community-areas-title">Built around organizing, care, and collective memory.</h2>
+          </div>
+
+          <div class="cards" aria-label="Community areas">
+            <article class="card">
+              <h3>Organizing</h3>
+              <p>Community announcements, event planning, volunteer coordination, and mutual aid updates.</p>
+            </article>
+            <article class="card">
+              <h3>Education</h3>
+              <p>Zines, archive materials, public resources, and shared history from the collective.</p>
+            </article>
+            <article class="card">
+              <h3>Care</h3>
+              <p>Privacy-minded member spaces with separate organizer administration.</p>
+            </article>
           </div>
         </section>
       </main>
@@ -335,25 +416,5 @@
         }
       });
     </script>
-  </body>
-</html>
-
-
-        <div class="cards" aria-label="Community areas">
-          <article class="card">
-            <h2>Organizing</h2>
-            <p>Community announcements, event planning, volunteer coordination, and mutual aid updates.</p>
-          </article>
-          <article class="card">
-            <h2>Education</h2>
-            <p>Zines, archive materials, public resources, and shared history from the collective.</p>
-          </article>
-          <article class="card">
-            <h2>Care</h2>
-            <p>Privacy-minded member spaces with separate organizer administration.</p>
-          </article>
-        </div>
-      </section>
-    </main>
   </body>
 </html>

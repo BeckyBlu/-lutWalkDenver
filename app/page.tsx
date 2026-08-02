@@ -114,6 +114,7 @@ export default function HomePage() {
                 <li><Link href="/about">About</Link></li>
                 <li><Link href="/shop">Store</Link></li>
                 <li><Link href="/bulletin">Bulletin</Link></li>
+                <li><Link href="/chat">Chat</Link></li>
                 <li><Link href="/calendar">Calendar</Link></li>
                 <li><Link href="/admin-login">Admin</Link></li>
               </ul>
@@ -175,9 +176,21 @@ export default function HomePage() {
             <h3>Bulletin Board</h3>
             <p>Announcements, volunteer opportunities, mutual aid requests, and discussion topics.</p>
           </Link>
+          <Link className="dashboard-card" href="/chat">
+            <h3>Member Chatroom</h3>
+            <p>Private, encrypted conversations for organizing, safety, and mutual aid coordination.</p>
+          </Link>
           <Link className="dashboard-card" href="/calendar">
             <h3>Community Calendar</h3>
             <p>Meetings, marches, workshops, volunteer shifts, and community gatherings.</p>
+          </Link>
+          <Link className="dashboard-card" href="/community">
+            <h3>Community Gallery</h3>
+            <p>Photos, flyers, artwork, and community materials curated for the collective.</p>
+          </Link>
+          <Link className="dashboard-card" href="/archive">
+            <h3>Archive</h3>
+            <p>Historical materials, education resources, and long-term memory from the movement.</p>
           </Link>
           <Link className="dashboard-card" href="/admin-login">
             <h3>Administrator Portal</h3>
