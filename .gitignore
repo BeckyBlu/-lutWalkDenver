@@ -9,7 +9,10 @@ tsconfig.tsbuildinfo
 @img/
 @next/
 
-# Local environment files (never commit secrets)
+# Local environment files and demo credential files (never commit secrets)
 .env
 .env.local
 .env.*.local
+*.secrets
+*.passwords
+demo-passwords.*
