@@ -387,6 +387,9 @@ export default function BulletinPage() {
           <p className="eyebrow">Bulletin board</p>
           <h1>Announcements, requests, and collective updates.</h1>
           <p>Members can coordinate volunteer opportunities, mutual aid requests, and projects in one shared space.</p>
+          <div className="btn-row">
+            <Link className="btn btn-secondary" href="/chatroom-spec">View E2EE spec</Link>
+          </div>
         </div>
       </header>
 
