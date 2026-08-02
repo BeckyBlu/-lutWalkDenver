@@ -1,14 +1,19 @@
 import crypto from 'crypto';
 
-const AUTH_SECRET = process.env.AUTH_SECRET ?? '';
 const TOKEN_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
 function base64url(input: string | Buffer) {
   return Buffer.from(input).toString('base64url');
 }
 
+function getAuthSecret() {
+  return process.env.AUTH_SECRET ?? '';
+}
+
 export function signToken(payload: Record<string, unknown>) {
-  if (!AUTH_SECRET) {
+  const authSecret = getAuthSecret();
+
+  if (!authSecret) {
     throw new Error('AUTH_SECRET is not configured');
   }
 
@@ -17,13 +22,15 @@ export function signToken(payload: Record<string, unknown>) {
   const exp = iat + TOKEN_TTL_SECONDS;
   const body = { ...payload, iat, exp };
   const encoded = `${base64url(JSON.stringify(header))}.${base64url(JSON.stringify(body))}`;
-  const signature = crypto.createHmac('sha256', AUTH_SECRET).update(encoded).digest('base64url');
+  const signature = crypto.createHmac('sha256', authSecret).update(encoded).digest('base64url');
 
   return `${encoded}.${signature}`;
 }
 
 export function verifyToken(token: string) {
-  if (!token || !AUTH_SECRET) {
+  const authSecret = getAuthSecret();
+
+  if (!token || !authSecret) {
     return null;
   }
 
@@ -35,7 +42,7 @@ export function verifyToken(token: string) {
     }
 
     const unsigned = `${encodedHeader}.${encodedBody}`;
-    const expectedSignature = crypto.createHmac('sha256', AUTH_SECRET).update(unsigned).digest('base64url');
+    const expectedSignature = crypto.createHmac('sha256', authSecret).update(unsigned).digest('base64url');
 
     // Compare decoded buffers so timingSafeEqual operates on raw bytes
     const sigBuf = Buffer.from(signature, 'base64url');
