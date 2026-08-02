@@ -379,6 +379,7 @@ export default function BulletinPage() {
             <li><Link href="/">Home</Link></li>
             <li><Link href="/about">About</Link></li>
             <li><Link href="/shop">Store</Link></li>
+            <li><Link href="/chat">Chat</Link></li>
             <li><Link href="/calendar">Calendar</Link></li>
             <li><Link href="/admin-login">Admin</Link></li>
           </ul>

@@ -49,9 +49,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = await request.json() as { text?: unknown; sender?: unknown };
+    const body = await request.json() as { text?: unknown; sender?: unknown; encrypted?: unknown };
     const text = typeof body.text === 'string' ? body.text.trim() : '';
     const sender = typeof body.sender === 'string' ? body.sender.trim() || 'Member' : 'Member';
+    const encrypted = body.encrypted === true;
 
     if (!text) {
       return NextResponse.json({ error: 'text is required' }, { status: 400 });
@@ -61,6 +62,7 @@ export async function POST(request: Request) {
     const ref = await db.collection('messages').add({
       sender,
       text,
+      encrypted,
       createdAt: FieldValue.serverTimestamp(),
     });
 
