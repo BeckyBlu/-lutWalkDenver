@@ -105,48 +105,63 @@ export default function HomePage() {
       )}
 
       <div id="siteContent" style={{ display: unlocked ? 'block' : 'none' }}>
-        <main className="shell">
-          <header className="hero">
-            <nav>
-              <div className="logo">$lutWalk Denver</div>
+        <header>
+          <nav aria-label="Primary navigation">
+              <Link className="logo" href="/" aria-label="SlutWalk Denver homepage">
+                $lutWalk Denver
+              </Link>
 
               <ul>
-                <li><Link href="/about">About</Link></li>
+                <li><Link href="/about" aria-label="Learn about SlutWalk Denver">About</Link></li>
+                <li><Link href="/organizing" aria-label="Community organizing section">Organizing</Link></li>
+                <li><Link href="/education" aria-label="Education and resources">Education</Link></li>
+                <li><Link href="/care" aria-label="Care and support resources">Care</Link></li>
                 <li><Link href="/shop">Store</Link></li>
                 <li><Link href="/bulletin">Bulletin</Link></li>
                 <li><Link href="/chat">Chat</Link></li>
                 <li><Link href="/calendar">Calendar</Link></li>
-                <li><Link href="/admin-login">Admin</Link></li>
+                <li><Link href="/community">Gallery</Link></li>
+                <li><Link href="/zines">Zines</Link></li>
+                <li><Link href="/admin-login" aria-label="Administrator login">Admin</Link></li>
               </ul>
             </nav>
+          </header>
 
-        <div className="hero-overlay">
-          <p className="eyebrow">Community hub</p>
-          <h1>$lutWalk Denver is a living collective.</h1>
+        <main id="main-content" className="shell">
+          <section className="hero" aria-labelledby="page-title">
+            <div className="hero-overlay">
+              <p className="eyebrow">Community hub</p>
+              <h1 id="page-title">$lutWalk Denver is a living collective.</h1>
 
-          <p>
-            A public landing page for community information, a protected member dashboard,
-            and a separate administrator portal for organizers.
-          </p>
+              <p>
+                A public landing page for community information, a protected member dashboard,
+                and a separate administrator portal for organizers.
+              </p>
 
-          <div className="btn-row">
-            <Link className="btn" href="/about">Enter member space</Link>
-            <Link className="btn btn-secondary" href="/admin-login">Administrator portal</Link>
-            <button className="btn btn-secondary" type="button" onClick={() => void handleLogout()}>
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
+              <div className="btn-row">
+                <Link className="btn" href="/community" aria-label="Enter member dashboard">
+                  Enter Community Hub
+                </Link>
+                <Link className="btn btn-secondary" href="/admin-login" aria-label="Access administrator portal">
+                  Administrator Portal
+                </Link>
+                {unlocked && (
+                  <button className="btn btn-secondary" type="button" onClick={() => void handleLogout()} aria-label="Sign out of member dashboard">
+                    Sign Out
+                  </button>
+                )}
+              </div>
+            </div>
+          </section>
 
-      <section className="featured">
+          <section className="featured" aria-labelledby="featured-heading">
         <p className="eyebrow">Public landing page</p>
-        <h2>Built for organizing, education, and collective care.</h2>
+        <h2 id="featured-heading">Built for organizing, education, and collective care.</h2>
         <p>
           This landing view welcomes new visitors, shares community information,
           and directs members into the protected pages for organizing and resource sharing.
         </p>
-        <div className="notice-grid">
+        <div className="notice-grid" role="region" aria-label="Site notices">
           <article>
             <h3>Accessibility statement</h3>
             <p>Keyboard-friendly navigation, strong contrast, and clear structure support inclusive access.</p>
@@ -156,9 +171,9 @@ export default function HomePage() {
             <p>Member access is enforced with secure, httpOnly session cookies and can be cleared at any time.</p>
           </article>
         </div>
-      </section>
+          </section>
 
-      <section className={`content ${unlocked ? 'content--open' : 'content--locked'}`}>
+          <section className={`content ${unlocked ? 'content--open' : 'content--locked'}`}>
         <p className="eyebrow">Member dashboard</p>
         <h2>Welcome back, organizer.</h2>
         <p>Move between the protected pages for about, store, bulletin board, calendar, and administration.</p>
@@ -304,9 +319,9 @@ export default function HomePage() {
             <h3>Press archive</h3>
             <p>Media coverage, interviews, and public statements.</p>
           </article>
+          </section>
         </section>
-      </section>
-    </main>
+        </main>
   </div>
 </>
   );
