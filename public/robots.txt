@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Disallow sensitive areas
+Disallow: /admin
+Disallow: /admin-login
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://slutwalkdenver.gay/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 5

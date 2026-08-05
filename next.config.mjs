@@ -1,5 +1,25 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable React Strict Mode for better development
+  reactStrictMode: true,
+  
+  // Image optimization
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+    // Optimize images for modern formats
+    formats: ['image/avif', 'image/webp'],
+    // Minimum cache time for images (in seconds)
+    
+  },
+  
+  
   async redirects() {
     return [
       { source: '/index.html', destination: '/', permanent: true },
@@ -10,6 +30,13 @@ const nextConfig = {
       { source: '/community.html', destination: '/community', permanent: true },
       { source: '/zine.html', destination: '/zines', permanent: true },
       { source: '/admin-login.html', destination: '/admin-login', permanent: true },
+      // Add redirects for new pages
+      { source: '/organizing.html', destination: '/organizing', permanent: true },
+      { source: '/education.html', destination: '/education', permanent: true },
+      { source: '/care.html', destination: '/care', permanent: true },
+      { source: '/privacy.html', destination: '/privacy', permanent: true },
+      { source: '/terms.html', destination: '/terms', permanent: true },
+      { source: '/accessibility.html', destination: '/accessibility', permanent: true },
     ];
   },
   async headers() {
