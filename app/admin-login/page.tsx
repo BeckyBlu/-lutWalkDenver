@@ -91,6 +91,7 @@ export default function AdminLoginPage() {
               id="admin-password"
               name="admin-password"
               type="password"
+              autoComplete="current-password"
               value={gateModel.password}
               placeholder="Enter admin password"
               onChange={(event) => setGateModel({ ...gateModel, password: event.target.value })}
