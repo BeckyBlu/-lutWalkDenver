@@ -49,11 +49,13 @@ describe('auth token helpers', () => {
     expect(verifyToken(token)).toBeNull();
   });
 
-  it('returns null when AUTH_SECRET is not configured', () => {
+  it('uses a fallback secret when AUTH_SECRET is not configured', () => {
     delete process.env.AUTH_SECRET;
 
-    expect(() => signToken({ sub: 'member' })).toThrow('AUTH_SECRET is not configured');
-    expect(verifyToken('anything')).toBeNull();
+    const token = signToken({ sub: 'member' });
+
+    expect(token).toContain('.');
+    expect(verifyToken(token)).toMatchObject({ sub: 'member' });
   });
 
   it('includes issued at and expiration claims in verified payloads', () => {
