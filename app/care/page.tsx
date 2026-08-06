@@ -160,17 +160,17 @@ export default function CarePage() {
         <h2 id="testimonials-heading">Community Testimonials</h2>
         <div className="archive">
           <article>
-            <h3>"This space saved my life"</h3>
+            <h3>“This space saved my life”</h3>
             <p>Finding this community gave me the support I needed to heal and the strength to keep fighting for justice.</p>
             <p className="muted">- Anonymous member</p>
           </article>
           <article>
-            <h3>"I found my voice here"</h3>
+            <h3>“I found my voice here”</h3>
             <p>Through the care and support of this collective, I learned to speak my truth and demand the respect I deserve.</p>
             <p className="muted">- Anonymous member</p>
           </article>
           <article>
-            <h3>"We take care of each other"</h3>
+            <h3>“We take care of each other”</h3>
             <p>The mutual aid network ensured I had what I needed when I had nowhere else to turn. This is what community looks like.</p>
             <p className="muted">- Anonymous member</p>
           </article>

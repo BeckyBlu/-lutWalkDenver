@@ -32,7 +32,7 @@ The current experience is a single gated home experience: visitors land on the p
 
 Landing Page
 ↓
-Password Entry (gate modal)
+Password Entry (gate modal, with `/index.html` static fallback and `/login` alias)
 ↓
 Unlocked Community Hub / member dashboard
 ↓
@@ -52,6 +52,7 @@ The administrator dashboard supports content controls for delete, add, and edit 
 
 - app/donate/page.tsx — simplified donation/support page with care-oriented links.
 - app/page.tsx — gated landing experience with session syncing and password entry.
+- app/login/page.tsx — lightweight `/login` alias to the gated landing page.
 - app/admin/page.tsx — administrator dashboard and moderation controls.
 - middleware.ts — protected member and admin paths.
 - app/layout.tsx — SEO metadata, canonical tags, icons, manifest, and structured data.
