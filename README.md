@@ -1,189 +1,162 @@
-## SlutWalk Denver web app
+# SlutWalk Denver — Overview
 
-This repository is a privacy-first community platform for SlutWalkDenver.gay, built with Next.js App Router, React 19, TypeScript, and Firebase. It combines a public landing experience, protected member spaces, an administrator dashboard, a community bulletin board, a calendar, an archive/gallery system, and a member chatroom designed for end-to-end encrypted communication.
+This repository is the implementation of the SlutWalk Denver community hub a virtual community center. It is designed for folks who want to understand the current website style, authentication model, and deployment architecture.
 
-## Everyday analogy
+## What this site is
 
-Think of SlutWalkDenver.gay as a community center.
+This is a privacy-first gated virtual community center web app with a hybrid static/Next.js App Router implementation.
 
-- The public lobby is the landing page, where visitors can learn about the community and enter the member experience.
-- The receptionist is the authentication layer, checking whether someone is a member or an administrator.
-- The members-only rooms are the protected community pages for the bulletin board, calendar, gallery, archive, and chatroom.
-- The staff-only office is the administrator dashboard, where organizers can moderate content and manage events, products, and uploads.
-- The bulletin board is the community bulletin board for public posts and announcements.
-- The lounge is the private member chatroom, where conversations are designed to stay private.
-- The calendar wall is the events calendar.
-- The archive room is the archive and gallery experience.
-- The gift shop is the community store.
-- The locked filing cabinets are the Firestore database and Firebase Storage, which hold content and metadata securely.
-- The secure storage room is the private encryption and key-management layer for member communications.
+- The root page (`/`) is the public landing experience and also serves as the member login gate.
+- A lightweight alias at `/login` redirects to the same root gate.
+- `index.html` is a static fallback page for legacy/static hosting and now includes a password entry flow that mirrors the app landing page.
+- Member-only sections are unlocked after password entry and protected by signed cookies and middleware.
+- Administrator access is separated from member access through a dedicated admin login path at `/admin-login`.
 
-In this analogy, visitors can enter the lobby, but they cannot enter the members-only rooms without the correct membership check. That is why the receptionist checks membership before allowing entry. The filing cabinets stay locked because they contain sensitive community records and user data that should not be exposed casually.
+## Who should read this
 
-## Production target and domain
+This README is written for:
 
-- Canonical production host: **Porkbun-hosted site with a Next.js-compatible runtime behind the domain**.
-- Canonical domain: **`slutwalkdenver.gay`**.
-- `www.slutwalkdenver.gay` should 301 redirect to `slutwalkdenver.gay`.
+- community organizers evaluating the live site behavior
+- server/operations staff deploying the app
+- developers maintaining the admin/moderator experience
+- security reviewers checking authentication and route protection
 
-## Landing Page and current experience flow
+## Site style and user experience
 
-The current experience is a single gated home experience: visitors land on the public page, enter the member password to unlock the community hub, and can then move into the protected sections. Administrators use a separate login path for the admin dashboard.
+The site is a gated virtual community center, not a traditional open CMS. It follows this pattern:
 
-Landing Page
-↓
-Password Entry (gate modal, with `/index.html` static fallback and `/login` alias)
-↓
-Unlocked Community Hub / member dashboard
-↓
-Protected pages (About, Store, Bulletin, Chat, Calendar, Gallery, Archive)
-↓
-Separate administrator login path
-↓
-Administrator dashboard
-↓
-Administrator logout
-↓
-Return to the member experience
+- Public landing content is visible at `/`
+- Password gate appears on root when no valid member session exists
+- Successful member login unlocks the member dashboard and protected navigation
+- Admin login is separate and does not share the member session cookie
+- Protected pages are enforced by middleware rather than client-side routing alone
 
-The administrator dashboard supports content controls for delete, add, and edit actions across posts, events, products, and gallery items.
+### Style of site
 
-### Current implementation snapshot
+This is a controlled-access community platform with a minimal onboarding gate. It is not a social network or a public blog. The goal is to provide:
 
-- app/donate/page.tsx — simplified donation/support page with care-oriented links.
-- app/page.tsx — gated landing experience with session syncing and password entry.
-- app/login/page.tsx — lightweight `/login` alias to the gated landing page.
-- app/admin/page.tsx — administrator dashboard and moderation controls.
-- middleware.ts — protected member and admin paths.
-- app/layout.tsx — SEO metadata, canonical tags, icons, manifest, and structured data.
-- app/globals.css — accessibility-oriented styling updates and improved contrast.
-- app/components/Footer.tsx — shared footer with contact, social, and legal links.
-- app/archive/page.tsx — archive and gallery experience for historical and educational material.
-- public/sitemap.xml, public/robots.txt, and index.html — SEO and static fallback support.
-- .env.local — local-only secrets and credentials, kept out of Git and never committed.
+- a safe entry point for community members
+- a private dashboard for ongoing member interaction
+- a separate admin channel for moderation, content updates, and uploads
+- a static fallback for legacy hosting via `index.html`
 
-## Runtime requirements
+## High-level architecture diagram
 
-This repository contains the full application stack required for production:
+```
+[Browser]
+   |-- /index.html (static fallback)
+   |-- / or /login -> app/page.tsx gated landing
+   |-- /admin-login -> app/login/page.tsx -> admin auth
+   |-- /admin -> protected admin dashboard
+   |-- /archive, /bulletin, /calendar, /chat, /community, /shop -> protected member pages
+   |-- /api/auth/* -> session creation / termination
+   |-- /api/* -> protected content APIs
 
-| Requirement | Implementation in this repo |
+[Next.js App Router]
+   |-- app/page.tsx
+   |-- app/login/page.tsx
+   |-- app/admin-login/page.tsx
+   |-- app/admin/page.tsx
+   |-- app/api/auth/*
+   |-- middleware.ts
+   |-- app/layout.tsx
+   |-- lib/auth.ts, lib/authz.ts, lib/firebase-admin.ts
+
+[Backend / Persistence]
+   |-- Firebase Admin SDK -> Firestore + Storage
+   |-- Signed cookies -> `sw_auth`, `sw_admin`
+```
+
+## Key routes and behavior
+
+| Route | Purpose |
 | --- | --- |
-| Backend server | Next.js App Router route handlers in `app/api/**` plus `middleware.ts` for protected routes. |
-| Database/storage | Firebase Admin SDK on the server for Firestore records and uploaded asset metadata/storage. |
-| Package manager | npm with the committed `package-lock.json`. |
-| Build pipeline | `npm ci` followed by `npm run build`; production runs with `npm run start` or a Next.js-compatible platform runtime. |
-| Framework | Next.js 15 with React 19 and TypeScript. |
-| Custom domain | `CNAME` and `public/CNAME` both contain `slutwalkdenver.gay`. |
+| `/` | Public landing + member password gate |
+| `/login` | Alias to `/` for accessibility and legacy convenience |
+| `/index.html` | Static fallback page with the same password entry experience |
+| `/admin-login` | Admin password entry route |
+| `/admin` | Admin-only dashboard |
+| `/archive`, `/bulletin`, `/calendar`, `/chat`, `/community`, `/shop`, `/zines` | Member-protected pages |
+| `/api/auth/login` | Member login endpoint (sets `sw_auth`, clears `sw_admin`) |
+| `/api/auth/admin-login` | Admin login endpoint (sets `sw_admin`, clears `sw_auth`) |
 
-See [Deployment Runbook](docs/deployment-runbook.md) for the step-by-step production checklist.
+## Authentication and authorization
 
-## Core member flow (locked behavior)
+### Member flow
 
-1. Public user lands on `/`.
-2. User submits member password at `/api/auth/login`.
-3. Server sets `sw_auth` (httpOnly) and clears `sw_admin`.
-4. Protected routes (`/archive`, `/bulletin`, `/calendar`, `/chat`, `/community`, `/events`, `/shop`, `/zines`) are accessible through middleware token verification.
-5. Unauthorized access to protected member routes is redirected to `/`.
+1. Visitor lands on `/`.
+2. They enter the member password.
+3. POST `/api/auth/login` validates the password and issues `sw_auth` cookie.
+4. Middleware allows protected member pages when `sw_auth` is valid.
+5. Member pages redirect to `/` if the session is missing or invalid.
 
-## Admin separation requirement
+### Admin flow
 
-- Admin login route is separate: `/admin-login` → `/api/auth/admin-login`.
-- Admin session uses `sw_admin` cookie only.
-- Member session uses `sw_auth` cookie only.
-- Admin login clears member cookie; member login clears admin cookie.
-- `/admin` route is admin-only in middleware.
+1. Admin lands on `/admin-login`.
+2. They enter the admin password.
+3. POST `/api/auth/admin-login` validates the password and issues `sw_admin` cookie.
+4. Middleware allows `/admin` only when `sw_admin` is valid.
+5. Admin login explicitly clears the member cookie and vice versa.
 
-## Gallery + upload architecture
+### Middleware protection
 
-- Binary upload endpoint: `/api/upload`.
-- Gallery metadata endpoints:
-  - `GET /api/gallery` (member/admin access)
-  - `POST /api/gallery` (admin only)
-  - `DELETE /api/gallery/[id]` (admin only)
-- Firestore collection: `galleryAssets`.
-- Community page (`/community`) renders uploaded `community` gallery assets.
-- Archive page (`/archive`) renders uploaded `archive` gallery assets grouped by category.
-- Admin dashboard archive tab uploads files and publishes metadata records.
+Protected routes are enforced by `middleware.ts`. It checks cookies for:
 
-## Community chatroom architecture
+- `sw_auth` → valid member session
+- `sw_admin` → valid admin session
 
-- The member chatroom lives at `/chat`.
-- Messages are encrypted client-side before transmission using Web Crypto AES-GCM.
-- The server stores ciphertext only, with the plaintext never logged or exposed server-side.
-- The chatroom supports key generation, key export, and offline-friendly encrypted message storage semantics.
-- The privacy model is designed to support future device verification, key rotation, and encrypted key backup workflows.
+Admin routes are strictly admin-only; member routes accept either member or admin access.
 
-## Blockchain note
+## Current admin-facing implementation summary
 
-- Blockchain is optional and not required for messaging.
-- If enabled later, it should only store SHA-256 hashes for consent, moderation, or document integrity evidence; never plaintext messages, images, files, or personal identifiers.
+- `app/page.tsx` — root gated landing page, member password entry, and dashboard launch.
+- `app/login/page.tsx` — lightweight `/login` alias redirect.
+- `app/admin-login/page.tsx` — admin password gate and redirect to admin dashboard.
+- `app/admin/page.tsx` — admin dashboard and moderation controls.
+- `middleware.ts` — route protection for member and admin content.
+- `app/api/auth/*` — auth endpoints for login, logout, and session state.
+- `lib/auth.ts` / `lib/authz.ts` — token signing, verification, and session helpers.
+- `lib/firebase-admin.ts` — Firebase Admin SDK initialization and Firestore/storage helpers.
+- `index.html` — static fallback page for legacy or static hosting.
+- `next.config.mjs` — legacy redirects and security headers.
 
-## Legacy path redirects
+## Deployment and runtime
 
-`next.config.mjs` now permanently redirects:
+This project is intended to run in a Node-compatible Next.js hosting environment with the following requirements:
 
-- `/index.html` → `/`
-- `/login.html` → `/login`
-- `/about.html` → `/about`
-- `/bulletin.html` → `/bulletin`
-- `/calendar.html` → `/calendar`
-- `/community.html` → `/community`
-- `/zine.html` → `/zines`
-- `/admin-login.html` → `/admin-login`
+- `npm install`
+- `npm run build`
+- `npm run start`
 
-## Local development
+It also supports static fallback behavior through `public/index.html` and legacy URL redirects configured in `next.config.mjs`.
+
+## Validation and checks
+
+Run the following to verify the codebase:
 
 ```bash
 npm install
-npm run dev
+npm run build
+npm run lint
+npm test
+npx tsc --noEmit
 ```
 
-## Validation
+## Environment variables
 
-- Build: `npm run build`
-- Type-check: `npx tsc --noEmit`
-- Tests: `npm test`
+Copy `.env.example` to `.env.local` and configure:
 
-## Hacking on the source
+- `AUTH_SECRET` — JWT signing secret for session cookies.
+- `MEMBER_PASSWORD` — member access password.
+- `ADMIN_PASSWORD` — admin access password.
+- Firebase Admin SDK credentials for Firestore and Storage.
+- Firebase client SDK values for optional client-side features.
 
-This repository is a Next.js web app, so the development workflow is based on Node.js and npm rather than a Java build system.
+> `MEMBER_PASSWORD` and `ADMIN_PASSWORD` should be treated as deployment secrets and not committed.
 
-### Build system overview
+## Notes for administrators
 
-- Runtime/build toolchain: Node.js + npm
-- Framework: Next.js App Router with React 19 and TypeScript
-- Main development commands:
-  - `npm install`
-  - `npm run dev`
-  - `npm run build`
-  - `npx tsc --noEmit`
-  - `npm test`
-
-### Where to start when exploring the codebase
-
-- `app/` — pages, route handlers, and UI components
-- `lib/` — authentication, Firebase helper modules, and shared logic
-- `public/` — static assets and SEO files
-- `docs/` — deployment and architecture notes
-
-### Notes for contributors
-
-- The password gate and member/admin access flow are implemented in the app routes and middleware rather than in a separate backend service.
-- Firebase is used for persistent content and uploads, while the auth flow is handled locally with signed cookies and server-side verification.
-- Keep local secrets in `.env.local` and do not commit them.
-
-## Required environment variables
-
-Copy `.env.example` to `.env.local` and set values for:
-
-- `AUTH_SECRET` - A long random string used to sign JWTs for member and admin sessions. Generate with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
-- `MEMBER_PASSWORD` for the shared community-member password. **Current password: `***REMOVED***`**
-  - Legacy deployment keys `SW_AUTH`, `sw_auth`, `SW__AUTH`, and `sw__auth` are also accepted for compatibility, but `MEMBER_PASSWORD` is preferred.
-- `ADMIN_PASSWORD` for administrator access.
-  - Legacy deployment keys `SW_ADMIN` and `sw_admin` are also accepted for compatibility, but `ADMIN_PASSWORD` is preferred.
-- Firebase Admin SDK credentials (optional, for gallery/upload features)
-- Firebase client SDK values (optional, for client-side Firebase features)
-
-## Architecture planning
-
-- See [Architecture Alignment Plan](docs/architecture-alignment-plan.md) for the route, data-flow, and phased implementation plan that aligns the current Next.js prototype with the requested community hub architecture.
+- The gate and admin separation are implemented inside the app and middleware, not through an external auth provider.
+- `index.html` is intentionally a working fallback, not a dead redirect.
+- Protected APIs and pages rely on the Firebase Admin SDK and signed cookies.
+- The repository includes a deployment runbook at `docs/deployment-runbook.md`.
