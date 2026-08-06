@@ -22,43 +22,44 @@ In this analogy, visitors can enter the lobby, but they cannot enter the members
 
 ## Production target and domain
 
-- Canonical production host: **Next.js hosting platform (recommended: Vercel)**.
+- Canonical production host: **Porkbun-hosted site with a Next.js-compatible runtime behind the domain**.
 - Canonical domain: **`slutwalkdenver.gay`**.
 - `www.slutwalkdenver.gay` should 301 redirect to `slutwalkdenver.gay`.
 
-## Landing Page
+## Landing Page and current experience flow
 
+The current experience is a single gated home experience: visitors land on the public page, enter the member password to unlock the community hub, and can then move into the protected sections. Administrators use a separate login path for the admin dashboard.
+
+Landing Page
 ↓
-
-Password Entry
-
+Password Entry (gate modal)
 ↓
-
-Member Dashboard
-
+Unlocked Community Hub / member dashboard
 ↓
-
-About
-
-Community Store
-
-Bulletin Board
-
-Member Chatroom
-
-Calendar
-
-Community Gallery
-
-Archive
-
+Protected pages (About, Store, Bulletin, Chat, Calendar, Gallery, Archive)
 ↓
-
-Administrator Login
-
+Separate administrator login path
 ↓
+Administrator dashboard
+↓
+Administrator logout
+↓
+Return to the member experience
 
-Administrator Dashboard
+The administrator dashboard supports content controls for delete, add, and edit actions across posts, events, products, and gallery items.
+
+### Current implementation snapshot
+
+- app/donate/page.tsx — simplified donation/support page with care-oriented links.
+- app/page.tsx — gated landing experience with session syncing and password entry.
+- app/admin/page.tsx — administrator dashboard and moderation controls.
+- middleware.ts — protected member and admin paths.
+- app/layout.tsx — SEO metadata, canonical tags, icons, manifest, and structured data.
+- app/globals.css — accessibility-oriented styling updates and improved contrast.
+- app/components/Footer.tsx — shared footer with contact, social, and legal links.
+- app/archive/page.tsx — archive and gallery experience for historical and educational material.
+- public/sitemap.xml, public/robots.txt, and index.html — SEO and static fallback support.
+- .env.local — local-only secrets and credentials, kept out of Git and never committed.
 
 ## Runtime requirements
 
@@ -140,6 +141,35 @@ npm run dev
 
 - Build: `npm run build`
 - Type-check: `npx tsc --noEmit`
+- Tests: `npm test`
+
+## Hacking on the source
+
+This repository is a Next.js web app, so the development workflow is based on Node.js and npm rather than a Java build system.
+
+### Build system overview
+
+- Runtime/build toolchain: Node.js + npm
+- Framework: Next.js App Router with React 19 and TypeScript
+- Main development commands:
+  - `npm install`
+  - `npm run dev`
+  - `npm run build`
+  - `npx tsc --noEmit`
+  - `npm test`
+
+### Where to start when exploring the codebase
+
+- `app/` — pages, route handlers, and UI components
+- `lib/` — authentication, Firebase helper modules, and shared logic
+- `public/` — static assets and SEO files
+- `docs/` — deployment and architecture notes
+
+### Notes for contributors
+
+- The password gate and member/admin access flow are implemented in the app routes and middleware rather than in a separate backend service.
+- Firebase is used for persistent content and uploads, while the auth flow is handled locally with signed cookies and server-side verification.
+- Keep local secrets in `.env.local` and do not commit them.
 
 ## Required environment variables
 
