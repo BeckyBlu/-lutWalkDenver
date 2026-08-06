@@ -83,6 +83,11 @@ export default function ShopPage() {
             </a>
             , our non-profit partner. Every contribution supports survivor care.
           </p>
+          <p style={{ marginTop: '0.75rem' }}>
+            <Link href="/donate" className="btn">
+              Open donation page →
+            </Link>
+          </p>
         </div>
       </header>
 
@@ -117,10 +122,10 @@ export default function ShopPage() {
                 />
               ) : (
                 <div className="product-img-placeholder" aria-hidden="true">
-                  {product.category === 'apparel' ? '👕' :
-                   product.category === 'stickers' ? '🏷️' :
-                   product.category === 'zines' ? '📄' :
-                   product.category === 'posters' ? '🖼️' : '📦'}
+                  {product.category === 'apparel' ? 'Apparel' :
+                   product.category === 'stickers' ? 'Stickers' :
+                   product.category === 'zines' ? 'Zines' :
+                   product.category === 'posters' ? 'Posters' : 'Items'}
                 </div>
               )}
               <div className="product-info">
@@ -163,7 +168,7 @@ export default function ShopPage() {
           onClick={(e) => { if (e.target === e.currentTarget) setSelectedProduct(null); }}
         >
           <div className="modal-card">
-            <button type="button" className="modal-close" onClick={() => setSelectedProduct(null)} aria-label="Close product details">✕</button>
+            <button type="button" className="modal-close" onClick={() => setSelectedProduct(null)} aria-label="Close product details">×</button>
             {selectedProduct.imageUrl && (
               <Image src={selectedProduct.imageUrl} alt={selectedProduct.name} width={400} height={400} style={{ maxWidth: '100%', height: 'auto' }} unoptimized />
             )}

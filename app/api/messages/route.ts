@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '../../../lib/firebase-admin';
 import { requireMemberOrAdmin } from '../../../lib/authz';
-import { FieldValue } from 'firebase-admin/firestore';
+import { FieldValue, type QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 
 export async function GET(request: Request) {
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
       .limit(limitN)
       .get();
 
-    const messages = snap.docs.map((doc) => {
+    const messages = snap.docs.map((doc: QueryDocumentSnapshot) => {
       const d = doc.data();
       const ts = d.createdAt;
       const time =
