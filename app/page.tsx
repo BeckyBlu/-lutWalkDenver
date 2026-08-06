@@ -12,6 +12,7 @@ export default function HomePage() {
   const [gateModel, setGateModel] = useState<GateModel>(initialGateModel);
   const [unlocked, setUnlocked] = useState(false);
   const [message, setMessage] = useState('Members enter the shared password to unlock the dashboard.');
+  const isEepsiteEnabled = process.env.NEXT_PUBLIC_EEPSITE?.toLowerCase() === 'true';
 
   useEffect(() => {
     let active = true;
@@ -230,16 +231,21 @@ export default function HomePage() {
 
         <aside className="notice-grid" style={{ marginTop: '2rem' }}>
           <article>
-            <h3>Privacy-first access via I2P</h3>
+            <h3>{isEepsiteEnabled ? 'Privacy-first access via I2P' : 'Privacy-first access'}</h3>
             <p>
-              For maximum privacy, access this community through our{' '}
-              <strong>I2P eepsite</strong>. Your IP address never reaches our
-              servers — traffic is routed through the I2P anonymity network end-to-end.
-              See{' '}
-              <a href="https://github.com/BeckyBlu/-lutWalkDenver/blob/main/i2p.md" target="_blank" rel="noopener noreferrer">
-                the I2P setup guide
-              </a>{' '}
-              for installation and connection instructions.
+              {isEepsiteEnabled ? (
+                <>
+                  This deployment is configured for the I2P eepsite experience. Access the community
+                  through the I2P-hosted endpoint once the tunnel is live. The member experience stays
+                  the same, and the same password-protected access applies.
+                </>
+              ) : (
+                <>
+                  For maximum privacy, this community can be accessed through an I2P eepsite once the
+                  hosting environment is configured for it. The member experience remains the same,
+                  with the same password-protected access and the same privacy-minded session handling.
+                </>
+              )}
             </p>
           </article>
         </aside>
