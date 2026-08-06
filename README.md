@@ -145,11 +145,15 @@ npm run dev
 
 Copy `.env.example` to `.env.local` and set values for:
 
-- `AUTH_SECRET`
-- `MEMBER_PASSWORD` for the shared community-member password. Legacy deployment keys `SW_AUTH`, `sw_auth`, `SW__AUTH`, and `sw__auth` are also accepted for compatibility, but `MEMBER_PASSWORD` is preferred.
-- `ADMIN_PASSWORD` for administrator access. Legacy deployment keys `SW_ADMIN` and `sw_admin` are also accepted for compatibility, but `ADMIN_PASSWORD` is preferred.
-- Firebase Admin SDK credentials
-- Firebase client SDK values
+- `AUTH_SECRET` - A long random string used to sign JWTs for member and admin sessions. Generate with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+- `MEMBER_PASSWORD` for the shared community-member password. **Current password: `***REMOVED***`**
+  - Legacy deployment keys `SW_AUTH`, `sw_auth`, `SW__AUTH`, and `sw__auth` are also accepted for compatibility, but `MEMBER_PASSWORD` is preferred.
+- `ADMIN_PASSWORD` for administrator access. **Current password: `***REMOVED***`**
+  - Legacy deployment keys `SW_ADMIN` and `sw_admin` are also accepted for compatibility, but `ADMIN_PASSWORD` is preferred.
+- Firebase Admin SDK credentials (optional, for gallery/upload features)
+- Firebase client SDK values (optional, for client-side Firebase features)
+
+**⚠️ IMPORTANT**: Never commit `.env.local` to version control. It is already in `.gitignore`.
 
 ## Architecture planning
 
