@@ -23,7 +23,7 @@ const nextConfig = {
   async redirects() {
     return [
       { source: '/index.html', destination: '/', permanent: true },
-      { source: '/login.html', destination: '/', permanent: true },
+      { source: '/login.html', destination: '/login', permanent: true },
       { source: '/about.html', destination: '/about', permanent: true },
       { source: '/bulletin.html', destination: '/bulletin', permanent: true },
       { source: '/calendar.html', destination: '/calendar', permanent: true },

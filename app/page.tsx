@@ -11,7 +11,7 @@ const ACCESS_KEY = 'slutwalk-access';
 export default function HomePage() {
   const [gateModel, setGateModel] = useState<GateModel>(initialGateModel);
   const [unlocked, setUnlocked] = useState(false);
-  const [message, setMessage] = useState('Members enter the shared password to unlock the dashboard.');
+  const [message, setMessage] = useState('Enter your password to unlock the community hub.');
   const isEepsiteEnabled = process.env.NEXT_PUBLIC_EEPSITE?.toLowerCase() === 'true';
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function HomePage() {
 
     window.localStorage.removeItem(ACCESS_KEY);
     setUnlocked(false);
-    setMessage('Members enter the shared password to unlock the dashboard.');
+    setMessage('Enter your password to unlock the community hub.');
   };
 
   const handleDecline = () => {
@@ -109,7 +109,7 @@ export default function HomePage() {
                 onChange={(event) => setGateModel({ ...gateModel, password: event.target.value })}
               />
               <div className="gate-modal-buttons">
-                <button id="loginBtn" type="submit">Enter Community</button>
+                <button id="loginBtn" type="submit">Enter Community Hub</button>
                 <button type="button" id="declineBtn" className="decline-btn" onClick={handleDecline}>
                   Leave
                 </button>

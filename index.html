@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="refresh" content="0; url=/" />
     <title>$lutWalk Denver - Community Hub</title>
     <meta name="description" content="Community hub for $lutWalk Denver organizing, education, events, zines, and mutual aid resources." />
     <style>
@@ -53,30 +52,33 @@
         font-family: "Space Grotesk", Inter, system-ui, sans-serif;
         font-weight: 800;
         font-size: 2.5rem;
-        margin: 0 0 1rem;
+        margin: 0 0 0.75rem;
         text-transform: uppercase;
         letter-spacing: 2px;
       }
 
-      p {
+      .subtitle {
         color: var(--muted);
-        line-height: 1.6;
         margin: 0 0 2rem;
       }
 
-      .loading {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(255, 248, 240, 0.3);
-        border-radius: 50%;
-        border-top-color: var(--hot-pink);
-        animation: spin 1s ease-in-out infinite;
-        margin-left: 10px;
+      input[type="password"] {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 248, 240, 0.2);
+        background: rgba(255, 248, 240, 0.05);
+        color: var(--white);
+        font-size: 1rem;
+        outline: none;
       }
 
-      @keyframes spin {
-        to { transform: rotate(360deg); }
+      .btn-row {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
       }
 
       .notice {
@@ -89,7 +91,21 @@
 
       .notice p {
         margin: 0;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+      }
+
+      .message {
+        margin-top: 1rem;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .error {
+        color: #ff8ab4;
+      }
+
+      .success {
+        color: #b3ffae;
       }
 
       .btn {
@@ -99,36 +115,88 @@
         color: var(--white);
         font-weight: 700;
         border-radius: 100px;
-        margin-top: 1rem;
         transition: transform 0.2s;
       }
 
       .btn:hover {
         transform: scale(1.05);
       }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>$lutWalk Denver</h1>
-      <p>Loading community hub<span class="loading"></span></p>
-      
+      <p class="subtitle">Member password entry for the community hub.</p>
+
+      <form id="gateForm">
+        <label for="password" class="sr-only">Member password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          autocomplete="current-password"
+          placeholder="Enter password"
+          required
+        />
+
+        <div class="btn-row">
+          <button type="submit" class="btn">Enter Community Hub</button>
+          <a href="/" class="btn">Open App Root</a>
+        </div>
+
+        <p id="message" class="message">Enter your password to unlock the community hub.</p>
+      </form>
+
       <div class="notice">
-        <p>If you're not redirected automatically, please wait a moment or:</p>
-        <a href="/" class="btn">Enter Community Hub</a>
-      </div>
-      
-      <div class="notice" style="margin-top: 1rem;">
-        <p>
-          If the redirect does not complete, please open the community hub manually.
-        </p>
+        <p>If this page is being served as a static fallback, the app root is still available at <strong>/</strong>.</p>
       </div>
     </div>
 
     <script>
-      // Redirect to the Next.js app root
-      // This handles cases where static hosting serves this file
-      window.location.href = "/";
+      const form = document.getElementById('gateForm');
+      const passwordInput = document.getElementById('password');
+      const messageEl = document.getElementById('message');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        messageEl.textContent = 'Checking password...';
+        messageEl.className = 'message';
+
+        try {
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ password: passwordInput.value }),
+          });
+
+          if (!response.ok) {
+            messageEl.textContent = 'Incorrect password. Please try again.';
+            messageEl.classList.add('error');
+            return;
+          }
+
+          messageEl.textContent = 'Password accepted. Redirecting to the community hub...';
+          messageEl.classList.add('success');
+          window.location.href = '/';
+        } catch (error) {
+          messageEl.textContent = 'Unable to connect to the app. Please try again later.';
+          messageEl.classList.add('error');
+        }
+      });
     </script>
   </body>
 </html>
