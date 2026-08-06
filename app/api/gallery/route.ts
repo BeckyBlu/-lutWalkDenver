@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { FieldValue } from 'firebase-admin/firestore';
+import { FieldValue, type QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { getAdminDb } from '../../../lib/firebase-admin';
 import { requireAdmin, requireMemberOrAdmin } from '../../../lib/authz';
 
@@ -32,8 +32,8 @@ export async function GET(request: Request) {
     const snap = await db.collection('galleryAssets').orderBy('createdAt', 'desc').limit(limit).get();
 
     const assets = snap.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }) as GalleryAssetRecord)
-      .filter((asset) => {
+      .map((doc: QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }) as GalleryAssetRecord)
+      .filter((asset: GalleryAssetRecord) => {
         if (collectionFilter && asset.collection !== collectionFilter) return false;
         if (categoryFilter && asset.category !== categoryFilter) return false;
         return true;

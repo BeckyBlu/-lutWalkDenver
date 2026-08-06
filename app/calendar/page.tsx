@@ -252,7 +252,7 @@ export default function CalendarPage() {
               onClick={() => setSelectedEvent(null)}
               aria-label="Close event details"
             >
-              ✕
+              ×
             </button>
             <p className="eyebrow">{selectedEvent.date}</p>
             <h2>{selectedEvent.title}</h2>
@@ -262,7 +262,7 @@ export default function CalendarPage() {
 
             <div className="btn-row" style={{ justifyContent: 'flex-start', marginTop: '1rem' }}>
               {rsvpDone ? (
-                <span className="rsvp-confirm">✓ You&apos;re attending!</span>
+                <span className="rsvp-confirm">You&apos;re attending.</span>
               ) : (
                 <button type="button" className="btn" onClick={() => void handleRsvp()}>
                   RSVP

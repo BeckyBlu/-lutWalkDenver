@@ -159,7 +159,7 @@ export default function AdminDashboardPage() {
       }),
     });
     if (res.ok) {
-      setEvtStatus('Event created ✓');
+      setEvtStatus('Event created');
       setEvtTitle(''); setEvtDate(''); setEvtTime(''); setEvtLocation(''); setEvtDescription('');
       void loadData();
     } else {
@@ -204,7 +204,7 @@ export default function AdminDashboardPage() {
       }),
     });
     if (res.ok) {
-      setProdStatus('Product created ✓');
+      setProdStatus('Product created');
       setProdName(''); setProdDesc(''); setProdPrice(''); setProdStock(''); setProdImageFile(null);
       void loadData();
     } else {
@@ -253,7 +253,7 @@ export default function AdminDashboardPage() {
       });
 
       if (metaRes.ok) {
-        setArchiveStatus('Upload + gallery publish complete ✓');
+        setArchiveStatus('Upload and gallery publish complete');
         setArchiveFile(null);
         setArchiveTitle('');
         setArchiveDescription('');
@@ -342,14 +342,14 @@ export default function AdminDashboardPage() {
         {/* ── Moderation ───────────────────────────────────────────────── */}
         {activeTab === 'moderation' && (
           <>
-            <h2>Content moderation</h2>
+            <h2>Content moderation controls</h2>
             {posts.length === 0 && <p>No posts yet.</p>}
             <div className="admin-list">
               {posts.map((post) => (
                 <article key={post.id} className="admin-list-item">
                   <div className="admin-list-meta">
                     <strong>{post.title}</strong>
-                    {post.pinned && <span className="pin-badge"> 📌 Pinned</span>}
+                    {post.pinned && <span className="pin-badge">Pinned</span>}
                     <span className="muted"> · {post.replyCount ?? 0} replies</span>
                   </div>
                   <p className="admin-list-body">{post.text}</p>
@@ -359,7 +359,7 @@ export default function AdminDashboardPage() {
                       className="btn btn-secondary"
                       onClick={() => void togglePin(post)}
                     >
-                      {post.pinned ? 'Unpin' : 'Pin'}
+                      {post.pinned ? 'Edit pin' : 'Add pin'}
                     </button>
                     <button
                       type="button"
@@ -378,9 +378,9 @@ export default function AdminDashboardPage() {
         {/* ── Events ───────────────────────────────────────────────────── */}
         {activeTab === 'events' && (
           <>
-            <h2>Event management</h2>
+            <h2>Event management controls</h2>
             <form className="admin-form" onSubmit={(e) => void createEvent(e)}>
-              <h3>Create event</h3>
+              <h3>Add event</h3>
               <label htmlFor="evt-title">Title</label>
               <input id="evt-title" type="text" value={evtTitle} onChange={(e) => setEvtTitle(e.target.value)} required />
 
@@ -396,11 +396,11 @@ export default function AdminDashboardPage() {
               <label htmlFor="evt-description">Description</label>
               <textarea id="evt-description" rows={4} value={evtDescription} onChange={(e) => setEvtDescription(e.target.value)} />
 
-              <button type="submit" className="btn">Create event</button>
+              <button type="submit" className="btn">Add event</button>
               {evtStatus && <p className="helper">{evtStatus}</p>}
             </form>
 
-            <h3>Existing events</h3>
+            <h3>Edit or delete events</h3>
             <div className="admin-list">
               {events.map((ev) => (
                 <article key={ev.id} className="admin-list-item">
@@ -410,6 +410,12 @@ export default function AdminDashboardPage() {
                   </div>
                   <p className="admin-list-body">{ev.location}</p>
                   <div className="admin-list-actions">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                    >
+                      Edit
+                    </button>
                     <button
                       type="button"
                       className="btn btn-danger"
@@ -428,7 +434,7 @@ export default function AdminDashboardPage() {
         {/* ── Products ─────────────────────────────────────────────────── */}
         {activeTab === 'products' && (
           <>
-            <h2>Store management</h2>
+            <h2>Store management controls</h2>
             <form className="admin-form" onSubmit={(e) => void createProduct(e)}>
               <h3>Add product</h3>
               <label htmlFor="prod-name">Product name</label>
@@ -462,7 +468,7 @@ export default function AdminDashboardPage() {
               {prodStatus && <p className="helper">{prodStatus}</p>}
             </form>
 
-            <h3>Current products</h3>
+            <h3>Edit or delete products</h3>
             <div className="admin-list">
               {products.map((prod) => (
                 <article key={prod.id} className="admin-list-item">
@@ -483,6 +489,12 @@ export default function AdminDashboardPage() {
                   <div className="admin-list-actions">
                     <button
                       type="button"
+                      className="btn btn-secondary"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
                       className="btn btn-danger"
                       onClick={() => void deleteProduct(prod.id)}
                     >
@@ -499,7 +511,7 @@ export default function AdminDashboardPage() {
         {/* ── Archive ───────────────────────────────────────────────────── */}
         {activeTab === 'archive' && (
           <>
-            <h2>Archive uploads</h2>
+            <h2>Archive controls</h2>
             <form className="admin-form" onSubmit={(e) => void uploadArchiveFile(e)}>
               <label htmlFor="archive-collection">Collection</label>
               <select
@@ -551,7 +563,7 @@ export default function AdminDashboardPage() {
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setArchiveFile(e.target.files?.[0] ?? null)}
               />
 
-              <button type="submit" className="btn" disabled={!archiveFile}>Upload</button>
+              <button type="submit" className="btn" disabled={!archiveFile}>Add archive item</button>
               {archiveStatus && <p className="helper">{archiveStatus}</p>}
               {archiveUrl && (
                 <p>
@@ -563,7 +575,7 @@ export default function AdminDashboardPage() {
               )}
             </form>
 
-            <h3>Published gallery assets</h3>
+            <h3>Edit or delete archive items</h3>
             <div className="admin-list">
               {galleryAssets.map((asset) => (
                 <article key={asset.id} className="admin-list-item">
@@ -576,6 +588,12 @@ export default function AdminDashboardPage() {
                     <a href={asset.imageUrl} target="_blank" rel="noopener noreferrer">{asset.imageUrl}</a>
                   ) : null}
                   <div className="admin-list-actions">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                    >
+                      Edit
+                    </button>
                     <button
                       type="button"
                       className="btn btn-danger"

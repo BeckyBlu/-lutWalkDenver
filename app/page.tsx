@@ -215,7 +215,7 @@ export default function HomePage() {
 
         <aside className="notice-grid" style={{ marginTop: '2rem' }}>
           <article>
-            <h3>🔒 Privacy-first access via I2P</h3>
+            <h3>Privacy-first access via I2P</h3>
             <p>
               For maximum privacy, access this community through our{' '}
               <strong>I2P eepsite</strong>. Your IP address never reaches our

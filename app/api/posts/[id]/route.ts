@@ -39,7 +39,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 }
 
 export async function POST(request: Request, context: RouteContext) {
-  // React handler for emoji reactions: POST /api/posts/[id] { reaction: "👍" }
+  // Reaction handler for post responses: POST /api/posts/[id] { reaction: "support" }
   if (!(await requireMemberOrAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

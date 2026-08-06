@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '../../../../../lib/firebase-admin';
 import { requireMemberOrAdmin } from '../../../../../lib/authz';
-import { FieldValue } from 'firebase-admin/firestore';
+import { FieldValue, type QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -52,7 +52,7 @@ export async function GET(_request: Request, context: RouteContext) {
       .orderBy('createdAt', 'asc')
       .get();
 
-    const replies = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const replies = snap.docs.map((doc: QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
     return NextResponse.json({ replies });
   } catch (err) {
     console.error('GET /api/posts/[id]/replies error:', err);

@@ -37,6 +37,9 @@ export default function ZinesPage() {
             <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" className="btn">
               Donate to access PDFs →
             </a>
+            <Link href="/donate" className="btn">
+              Open donation page →
+            </Link>
           </div>
         </div>
       </header>
