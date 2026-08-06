@@ -48,17 +48,28 @@ export default function HomePage() {
       body: JSON.stringify({ password: gateModel.password }),
     });
 
-    if (response.ok) {
+    if (!response.ok) {
+      window.localStorage.removeItem(ACCESS_KEY);
+      setUnlocked(false);
+      setMessage('Incorrect password. Please try again or contact an organizer.');
+      return;
+    }
+
+    try {
+      const sessionResponse = await fetch('/api/auth/session', { credentials: 'include' });
+      const sessionData = await sessionResponse.json() as { role?: 'member' | 'admin' | null };
+      const isUnlocked = sessionData.role === 'member' || sessionData.role === 'admin';
+
+      window.localStorage.setItem(ACCESS_KEY, String(isUnlocked));
+      setUnlocked(isUnlocked);
+      setGateModel(initialGateModel);
+      setMessage(isUnlocked ? 'Welcome back. Your member dashboard is ready.' : 'Members enter the shared password to unlock the dashboard.');
+    } catch {
       window.localStorage.setItem(ACCESS_KEY, 'true');
       setUnlocked(true);
       setGateModel(initialGateModel);
       setMessage('Welcome back. Your member dashboard is ready.');
-      return;
     }
-
-    window.localStorage.removeItem(ACCESS_KEY);
-    setUnlocked(false);
-    setMessage('Incorrect password. Please try again or contact an organizer.');
   };
 
   const handleLogout = async () => {
@@ -69,6 +80,7 @@ export default function HomePage() {
 
     window.localStorage.removeItem(ACCESS_KEY);
     setUnlocked(false);
+    setMessage('Members enter the shared password to unlock the dashboard.');
   };
 
   const handleDecline = () => {
@@ -85,9 +97,12 @@ export default function HomePage() {
             <p className="subtitle">Community Member Access</p>
 
             <form className="gate-form gate-modal-form" onSubmit={handleSubmit}>
+              <label htmlFor="password" className="sr-only">Member password</label>
               <input
                 type="password"
                 id="password"
+                name="password"
+                autoComplete="current-password"
                 placeholder="Enter Password"
                 value={gateModel.password}
                 onChange={(event) => setGateModel({ ...gateModel, password: event.target.value })}

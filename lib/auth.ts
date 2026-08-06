@@ -7,7 +7,7 @@ function base64url(input: string | Buffer) {
 }
 
 function getAuthSecret() {
-  return process.env.AUTH_SECRET ?? '';
+  return process.env.AUTH_SECRET || 'local-dev-secret';
 }
 
 export function signToken(payload: Record<string, unknown>) {

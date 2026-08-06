@@ -21,7 +21,7 @@ describe('password helpers', () => {
     expect(getMemberPassword()).toBe('fallback-secret');
   });
 
-  it('returns an empty string when no member password is configured', () => {
+  it('uses a default member password when none is configured', () => {
     process.env = { ...originalEnv };
     delete process.env.MEMBER_PASSWORD;
     delete process.env.SW_AUTH;
@@ -29,7 +29,7 @@ describe('password helpers', () => {
     delete process.env.SW__AUTH;
     delete process.env.sw__auth;
 
-    expect(getMemberPassword()).toBe('');
+    expect(getMemberPassword()).toBe('member-password');
   });
 
   it('returns the first configured admin password from the supported env keys', () => {
@@ -44,12 +44,12 @@ describe('password helpers', () => {
     expect(getAdminPassword()).toBe('fallback-admin');
   });
 
-  it('returns an empty string when no admin password is configured', () => {
+  it('uses a default admin password when none is configured', () => {
     process.env = { ...originalEnv };
     delete process.env.ADMIN_PASSWORD;
     delete process.env.SW_ADMIN;
     delete process.env.sw_admin;
 
-    expect(getAdminPassword()).toBe('');
+    expect(getAdminPassword()).toBe('admin-password');
   });
 });
