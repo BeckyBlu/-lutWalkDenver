@@ -34,7 +34,7 @@ type Thread = {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const REACTIONS = ['👍', '❤️', '✊', '🌹'];
+const REACTIONS = ['support', 'care', 'solidarity', 'share'];
 
 function formatTimestamp(value: unknown): string {
   // Handles serialized Firestore admin Timestamps ({ _seconds, _nanoseconds })
@@ -496,7 +496,7 @@ export default function BulletinPage() {
                   <div className="thread-header">
                     <strong>Anonymous</strong> • {thread.createdAt}
                     {thread.pinned && (
-                      <span className="pin-badge" aria-label="Pinned post"> 📌 Pinned</span>
+                      <span className="pin-badge" aria-label="Pinned post">Pinned</span>
                     )}
                     {isAdmin && (
                       <span className="admin-controls">

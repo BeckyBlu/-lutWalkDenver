@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '../../../lib/firebase-admin';
 import { requireAdmin, requireMemberOrAdmin } from '../../../lib/authz';
-import { FieldValue } from 'firebase-admin/firestore';
+import { FieldValue, type QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 export async function GET(request: Request) {
   if (!(await requireMemberOrAdmin())) {
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
       .limit(limit)
       .get();
 
-    const events = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const events = snap.docs.map((doc: QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
     return NextResponse.json({ events });
   } catch (err) {
     console.error('GET /api/events error:', err);
