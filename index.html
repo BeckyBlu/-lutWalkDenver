@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content="0; url=/" />
+    <title>$lutWalk Denver - Redirecting</title>
+    <meta name="description" content="Community hub for $lutWalk Denver organizing, education, events, zines, and mutual aid resources." />
+    <style>
+      :root {
+        color-scheme: dark;
+        --pink: #ff2d95;
+        --hot-pink: #ff4fb4;
+        --purple: #7d2cff;
+        --black: #111111;
+        --white: #ffffff;
+        --muted: #e0d5c7;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(180deg, #1b151b 0%, #120f13 100%);
+        color: #f5efe8;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .container {
+        max-width: 600px;
+        width: 100%;
+      }
+
+      h1 {
+        font-family: "Space Grotesk", Inter, system-ui, sans-serif;
+        font-weight: 800;
+        font-size: 2.5rem;
+        margin: 0 0 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      p {
+        color: var(--muted);
+        line-height: 1.6;
+        margin: 0 0 2rem;
+      }
+
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 248, 240, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--hot-pink);
+        animation: spin 1s ease-in-out infinite;
+        margin-left: 10px;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .notice {
+        margin-top: 2rem;
+        padding: 1rem;
+        border: 1px solid rgba(255, 248, 240, 0.16);
+        border-radius: 8px;
+        background: rgba(255, 248, 240, 0.05);
+      }
+
+      .notice p {
+        margin: 0;
+        font-size: 0.9rem;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #ff2d95, #ff70d3, #7d2cff);
+        color: var(--white);
+        font-weight: 700;
+        border-radius: 100px;
+        margin-top: 1rem;
+        transition: transform 0.2s;
+      }
+
+      .btn:hover {
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>$lutWalk Denver</h1>
+      <p>Loading community hub<span class="loading"></span></p>
+      
+      <div class="notice">
+        <p>If you're not redirected automatically, please wait a moment or:</p>
+        <a href="/" class="btn">Enter Community Hub</a>
+      </div>
+      
+      <div class="notice" style="margin-top: 1rem;">
+        <p>
+          <strong>Note:</strong> This is a Next.js application. For full functionality, 
+          please ensure you're running the development server (<code>npm run dev</code>) 
+          or have deployed to a Next.js-compatible host like Vercel.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Redirect to the Next.js app root
+      // This handles cases where static hosting serves this file
+      window.location.href = "/";
+    </script>
+  </body>
+</html>
