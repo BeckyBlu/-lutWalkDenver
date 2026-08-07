@@ -4,7 +4,7 @@ import { requireMemberOrAdmin } from '../../../../../lib/authz';
 import { FieldValue, type QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   if (!(await requireMemberOrAdmin())) {
