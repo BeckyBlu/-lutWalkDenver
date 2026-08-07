@@ -7,7 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test accessibility",
+    "test:responsive": "playwright test responsive",
+    "test:all": "npm run test:unit && npm run test:e2e"
   },
   "dependencies": {
     "@google-cloud/firestore": "^8.7.1",
@@ -24,6 +29,14 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.4.1",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "@vitejs/plugin-react": "^4.3.0",
+    "jsdom": "^24.0.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/jest-dom": "^6.4.0",
+    "@testing-library/user-event": "^14.5.0",
+    "@playwright/test": "^1.45.0",
+    "@axe-core/playwright": "^4.10.0",
+    "@axe-core/cli": "^4.10.0"
   }
 }
