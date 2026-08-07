@@ -94,7 +94,7 @@ export default function AccessibilityPage() {
             accessibility barriers:
           </p>
           <ul>
-            <li><strong>E-mail:</strong> <a href="mailto:accessibility@slutwalkdenver.gay">accessibility@slutwalkdenver.gay</a></li>
+            <li><strong>E-mail:</strong> <a href="mailto:denverslutwalk@gmail.com">accessibility@slutwalkdenver.gay</a></li>
             <li><strong>Phone:</strong> [Phone number if available]</li>
             <li><strong>Mailing Address:</strong> [Mailing address if available]</li>
           </ul>
