@@ -1517,3 +1517,8 @@ input[type="button"] {
     text-align: center;
   }
 }
+
+/* Hide Open App Root link in button rows */
+.btn-row a.btn {
+  display: none;
+}
