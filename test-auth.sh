@@ -16,20 +16,20 @@ fi
 
 BASE_URL="http://localhost:3000"
 
-echo "📡 Testing Member Login (***REMOVED***)"
+echo "📡 Testing Member Login ($MEMBER_PASSWORD)"
 echo "--------------------------------------"
 curl -s -X POST "$BASE_URL/api/auth/login" \
   -H "Content-Type: application/json" \
   -H "Origin: $BASE_URL" \
-  -d '{"password":"***REMOVED***"}' | jq .
+  -d '{"password":"$MEMBER_PASSWORD"}' | jq .
 
 echo ""
-echo "📡 Testing Admin Login (***REMOVED***)"
+echo "📡 Testing Admin Login ($MEMBER_PASSWORD)"
 echo "--------------------------------------"
 curl -s -X POST "$BASE_URL/api/auth/admin-login" \
   -H "Content-Type: application/json" \
   -H "Origin: $BASE_URL" \
-  -d '{"password":"***REMOVED***"}' | jq .
+  -d '{"password":"$MEMBER_PASSWORD"}' | jq .
 
 echo ""
 echo "📡 Testing Wrong Password"
