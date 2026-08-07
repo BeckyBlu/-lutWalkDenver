@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Test Authentication Script for SlutWalk Denver
 # Usage: MEMBER_PASSWORD='pass' ADMIN_PASSWORD='pass' ./test-auth.sh [URL]
@@ -19,29 +20,54 @@ echo "  Target: $BASE_URL"
 echo "=========================================="
 echo ""
 
-echo "Testing Member Login"
-echo "--------------------------------------"
-curl -s -X POST "$BASE_URL/api/auth/login" \
+# Test 1: Member login (POST)
+echo "Test 1: Member login (POST /api/auth/login)"
+echo "-------------------------------------------"
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE_URL/api/auth/login" \
   -H "Content-Type: application/json" \
   -H "Origin: $BASE_URL" \
-  -d "{\"password\":\"$MEMBER_PASSWORD\"}" | jq . 2>/dev/null || echo "(response not JSON)"
+  -d "{\"password\":\"$MEMBER_PASSWORD\"}")
+if [ "$HTTP_CODE" = "200" ]; then echo "  PASS (200)"; else echo "  FAIL (expected 200, got $HTTP_CODE)"; fi
 echo ""
 
+# Test 2: Wrong password rejected (401)
+echo "Test 2: Wrong password rejected"
+echo "-------------------------------------------"
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE_URL/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -H "Origin: $BASE_URL" \
+  -d '{"password":"definitely-wrong-12345"}')
+if [ "$HTTP_CODE" = "401" ]; then echo "  PASS (401)"; else echo "  FAIL (expected 401, got $HTTP_CODE)"; fi
+echo ""
+
+# Test 3: GET method not allowed (405)
+echo "Test 3: GET rejected (should be 405)"
+echo "-------------------------------------------"
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X GET "$BASE_URL/api/auth/login" -H "Origin: $BASE_URL")
+if [ "$HTTP_CODE" = "405" ]; then echo "  PASS (405)"; else echo "  WARN (expected 405, got $HTTP_CODE) - static server?"; fi
+echo ""
+
+# Test 4: Password trim (whitespace should still work)
+echo "Test 4: Password trim (whitespace)"
+echo "-------------------------------------------"
+TRIMMED="  $MEMBER_PASSWORD  "
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE_URL/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -H "Origin: $BASE_URL" \
+  -d "{\"password\":\"$TRIMMED\"}")
+if [ "$HTTP_CODE" = "200" ]; then echo "  PASS (200)"; else echo "  FAIL (expected 200, got $HTTP_CODE)"; fi
+echo ""
+
+# Test 5: Admin login (if ADMIN_PASSWORD provided)
 if [ -n "$ADMIN_PASSWORD" ]; then
-  echo "Testing Admin Login"
-  echo "--------------------------------------"
-  curl -s -X POST "$BASE_URL/api/auth/admin-login" \
+  echo "Test 5: Admin login (POST /api/auth/admin-login)"
+  echo "-------------------------------------------"
+  HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE_URL/api/auth/admin-login" \
     -H "Content-Type: application/json" \
     -H "Origin: $BASE_URL" \
-    -d "{\"password\":\"$ADMIN_PASSWORD\"}" | jq . 2>/dev/null || echo "(response not JSON)"
+    -d "{\"password\":\"$ADMIN_PASSWORD\"}")
+  if [ "$HTTP_CODE" = "200" ]; then echo "  PASS (200)"; else echo "  FAIL (expected 200, got $HTTP_CODE)"; fi
   echo ""
 fi
 
-echo "Testing Wrong Password"
-echo "--------------------------------------"
-curl -s -X POST "$BASE_URL/api/auth/login" \
-  -H "Content-Type: application/json" \
-  -H "Origin: $BASE_URL" \
-  -d '{\"password\":\"wrongpassword\"}' | jq . 2>/dev/null || echo "(response not JSON)"
-echo ""
-echo "Done."
+echo "Done. If 405/connection errors on production, deploy to Node.js (see docs/deployment-runbook.md)."
