@@ -3,7 +3,7 @@ import { getAdminDb } from '../../../../lib/firebase-admin';
 import { requireAdmin } from '../../../../lib/authz';
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   if (!(await requireAdmin())) {
@@ -30,12 +30,19 @@ export async function PATCH(
   const { id } = await params;
   try {
     const body = await request.json() as Record<string, unknown>;
-    const allowed = ['name', 'description', 'price', 'imageUrl', 'category', 'stock'];
+    const stringFields = ['name', 'description', 'imageUrl', 'category'];
+    const numberFields = ['price', 'stock'];
     const updates: Record<string, unknown> = {};
-    for (const key of allowed) {
-      if (key in body) {
-        updates[key] = typeof body[key] === 'string' ? (body[key] as string).trim() : body[key];
+    for (const key of stringFields) {
+      if (typeof body[key] === 'string') updates[key] = (body[key] as string).trim();
+    }
+    for (const key of numberFields) {
+      if (typeof body[key] === 'number' && !Number.isNaN(body[key])) {
+        updates[key] = body[key];
       }
+    }
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
     }
     const db = getAdminDb();
     await db.collection('products').doc(id).update(updates);
