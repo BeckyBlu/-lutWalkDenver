@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const { password } = await request.json();
     const memberPassword = getMemberPassword();
 
-    if (!memberPassword || password !== memberPassword) {
+    if (!memberPassword || password.trim() !== memberPassword.trim()) {
       return NextResponse.json({ ok: false, message: 'Unauthorized' }, { status: 401 });
     }
 
