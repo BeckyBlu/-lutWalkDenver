@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '../../../../lib/firebase-admin';
-import { requireAdmin, requireMemberOrAdmin } from '../../../../lib/authz';
-import { FieldValue } from 'firebase-admin/firestore';
+import { requireMemberOrAdmin, requireAdmin } from '../../../../lib/authz';
 
-type RouteContext = { params: Promise<{ id: string }> };
-
-export async function DELETE(_request: Request, context: RouteContext) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
-
-  const { id } = await context.params;
+  const { id } = await params;
   try {
     const db = getAdminDb();
     await db.collection('posts').doc(id).delete();
@@ -21,44 +20,23 @@ export async function DELETE(_request: Request, context: RouteContext) {
   }
 }
 
-export async function PATCH(request: Request, context: RouteContext) {
-  if (!(await requireAdmin())) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  if (!(await requireMemberOrAdmin())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
-  const { id } = await context.params;
+  const { id } = await params;
   try {
-    const body = await request.json() as { pinned?: boolean };
+    const body = await request.json() as { pinned?: unknown };
+    const updates: Record<string, unknown> = {};
+    if (typeof body.pinned === 'boolean') updates.pinned = body.pinned;
     const db = getAdminDb();
-    await db.collection('posts').doc(id).update({ pinned: body.pinned ?? false });
+    await db.collection('posts').doc(id).update(updates);
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('PATCH /api/posts/[id] error:', err);
     return NextResponse.json({ error: 'Failed to update post' }, { status: 500 });
-  }
-}
-
-export async function POST(request: Request, context: RouteContext) {
-  // Reaction handler for post responses: POST /api/posts/[id] { reaction: "support" }
-  if (!(await requireMemberOrAdmin())) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const { id } = await context.params;
-  try {
-    const body = await request.json() as { reaction?: string };
-    const reaction = typeof body.reaction === 'string' ? body.reaction : null;
-    if (!reaction) {
-      return NextResponse.json({ error: 'reaction is required' }, { status: 400 });
-    }
-
-    const db = getAdminDb();
-    await db.collection('posts').doc(id).update({
-      [`reactions.${reaction}`]: FieldValue.increment(1),
-    });
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error('POST /api/posts/[id] error:', err);
-    return NextResponse.json({ error: 'Failed to add reaction' }, { status: 500 });
   }
 }

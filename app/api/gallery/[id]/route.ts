@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 import { getAdminDb } from '../../../../lib/firebase-admin';
 import { requireAdmin } from '../../../../lib/authz';
 
-type RouteContext = { params: Promise<{ id: string }> };
-
-export async function DELETE(_request: Request, context: RouteContext) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
-
-  const { id } = await context.params;
+  const { id } = await params;
   try {
     const db = getAdminDb();
     await db.collection('galleryAssets').doc(id).delete();

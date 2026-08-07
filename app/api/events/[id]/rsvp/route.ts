@@ -1,21 +1,24 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '../../../../../lib/firebase-admin';
-import { requireMemberOrAdmin } from '../../../../../lib/authz';
+import { requireMemberOrAdmin, getServerSession } from '../../../../../lib/authz';
 import { FieldValue } from 'firebase-admin/firestore';
 
-type RouteContext = { params: Promise<{ id: string }> };
-
-export async function POST(_request: Request, context: RouteContext) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   if (!(await requireMemberOrAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
-  const { id } = await context.params;
+  const { id } = await params;
+  const session = await getServerSession();
+  const attendee = session?.claims?.sub ?? 'member';
   try {
+    const body = await request.json() as { status?: unknown };
+    const status = typeof body.status === 'string' ? body.status : 'attending';
     const db = getAdminDb();
-    // Use a placeholder member ID since this prototype uses shared passwords
     await db.collection('events').doc(id).update({
-      rsvps: FieldValue.arrayUnion('member'),
+      rsvps: FieldValue.arrayUnion({ attendee, status, at: new Date().toISOString() }),
     });
     return NextResponse.json({ ok: true });
   } catch (err) {
