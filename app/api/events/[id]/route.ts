@@ -3,7 +3,7 @@ import { getAdminDb } from '../../../../lib/firebase-admin';
 import { requireAdmin } from '../../../../lib/authz';
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   if (!(await requireAdmin())) {
@@ -34,6 +34,9 @@ export async function PATCH(
     const updates: Record<string, unknown> = {};
     for (const key of allowed) {
       if (typeof body[key] === 'string') updates[key] = (body[key] as string).trim();
+    }
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
     }
     const db = getAdminDb();
     await db.collection('events').doc(id).update(updates);
