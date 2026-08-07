@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 # Test Authentication Script for SlutWalk Denver
 # Usage: MEMBER_PASSWORD='pass' ADMIN_PASSWORD='pass' ./test-auth.sh [URL]
@@ -20,14 +20,24 @@ echo "  Target: $BASE_URL"
 echo "=========================================="
 echo ""
 
+PASS=0
+FAIL=0
+
+# Helper: safely build JSON password payload
+make_payload() {
+  local pw="$1"
+  printf '{"password":"%s"}' "$(printf '%s' "$pw" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+}
+
 # Test 1: Member login (POST)
 echo "Test 1: Member login (POST /api/auth/login)"
 echo "-------------------------------------------"
+PAYLOAD=$(make_payload "$MEMBER_PASSWORD")
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE_URL/api/auth/login" \
   -H "Content-Type: application/json" \
   -H "Origin: $BASE_URL" \
-  -d "{\"password\":\"$MEMBER_PASSWORD\"}")
-if [ "$HTTP_CODE" = "200" ]; then echo "  PASS (200)"; else echo "  FAIL (expected 200, got $HTTP_CODE)"; fi
+  -d "$PAYLOAD" 2>/dev/null) || HTTP_CODE="000"
+if [ "$HTTP_CODE" = "200" ]; then echo "  PASS (200)"; PASS=$((PASS+1)); else echo "  FAIL (expected 200, got $HTTP_CODE)"; FAIL=$((FAIL+1)); fi
 echo ""
 
 # Test 2: Wrong password rejected (401)
@@ -36,38 +46,44 @@ echo "-------------------------------------------"
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE_URL/api/auth/login" \
   -H "Content-Type: application/json" \
   -H "Origin: $BASE_URL" \
-  -d '{"password":"definitely-wrong-12345"}')
-if [ "$HTTP_CODE" = "401" ]; then echo "  PASS (401)"; else echo "  FAIL (expected 401, got $HTTP_CODE)"; fi
+  -d '{"password":"definitely-wrong-12345"}' 2>/dev/null) || HTTP_CODE="000"
+if [ "$HTTP_CODE" = "401" ]; then echo "  PASS (401)"; PASS=$((PASS+1)); else echo "  FAIL (expected 401, got $HTTP_CODE)"; FAIL=$((FAIL+1)); fi
 echo ""
 
 # Test 3: GET method not allowed (405)
 echo "Test 3: GET rejected (should be 405)"
 echo "-------------------------------------------"
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X GET "$BASE_URL/api/auth/login" -H "Origin: $BASE_URL")
-if [ "$HTTP_CODE" = "405" ]; then echo "  PASS (405)"; else echo "  WARN (expected 405, got $HTTP_CODE) - static server?"; fi
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X GET "$BASE_URL/api/auth/login" \
+  -H "Origin: $BASE_URL" 2>/dev/null) || HTTP_CODE="000"
+if [ "$HTTP_CODE" = "405" ]; then echo "  PASS (405)"; PASS=$((PASS+1)); else echo "  WARN (expected 405, got $HTTP_CODE) - static server?"; FAIL=$((FAIL+1)); fi
 echo ""
 
 # Test 4: Password trim (whitespace should still work)
 echo "Test 4: Password trim (whitespace)"
 echo "-------------------------------------------"
 TRIMMED="  $MEMBER_PASSWORD  "
+PAYLOAD=$(make_payload "$TRIMMED")
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE_URL/api/auth/login" \
   -H "Content-Type: application/json" \
   -H "Origin: $BASE_URL" \
-  -d "{\"password\":\"$TRIMMED\"}")
-if [ "$HTTP_CODE" = "200" ]; then echo "  PASS (200)"; else echo "  FAIL (expected 200, got $HTTP_CODE)"; fi
+  -d "$PAYLOAD" 2>/dev/null) || HTTP_CODE="000"
+if [ "$HTTP_CODE" = "200" ]; then echo "  PASS (200)"; PASS=$((PASS+1)); else echo "  FAIL (expected 200, got $HTTP_CODE)"; FAIL=$((FAIL+1)); fi
 echo ""
 
 # Test 5: Admin login (if ADMIN_PASSWORD provided)
 if [ -n "$ADMIN_PASSWORD" ]; then
   echo "Test 5: Admin login (POST /api/auth/admin-login)"
   echo "-------------------------------------------"
+  PAYLOAD=$(make_payload "$ADMIN_PASSWORD")
   HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE_URL/api/auth/admin-login" \
     -H "Content-Type: application/json" \
     -H "Origin: $BASE_URL" \
-    -d "{\"password\":\"$ADMIN_PASSWORD\"}")
-  if [ "$HTTP_CODE" = "200" ]; then echo "  PASS (200)"; else echo "  FAIL (expected 200, got $HTTP_CODE)"; fi
+    -d "$PAYLOAD" 2>/dev/null) || HTTP_CODE="000"
+  if [ "$HTTP_CODE" = "200" ]; then echo "  PASS (200)"; PASS=$((PASS+1)); else echo "  FAIL (expected 200, got $HTTP_CODE)"; FAIL=$((FAIL+1)); fi
   echo ""
 fi
 
-echo "Done. If 405/connection errors on production, deploy to Node.js (see docs/deployment-runbook.md)."
+echo "=========================================="
+echo "Results: $PASS passed, $FAIL failed"
+if [ "$FAIL" -gt 0 ]; then exit 1; fi
+echo "All tests passed."
