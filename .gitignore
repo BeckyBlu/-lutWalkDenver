@@ -8,6 +8,7 @@ tsconfig.tsbuildinfo
 # Vendored npm package directories (installed by npm install)
 @img/
 @next/
+__tests__/
 
 # Local environment files and demo credential files (never commit secrets)
 .env
