@@ -46,7 +46,7 @@ export default function HomePage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ password: gateModel.password }),
+      body: JSON.stringify({ password: gateModel.password.trim() }),
     });
 
     if (!response.ok) {
