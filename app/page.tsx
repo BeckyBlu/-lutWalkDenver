@@ -114,7 +114,7 @@ export default function HomePage() {
                   Leave
                 </button>
               </div>
-              <p id="errorMessage" className="helper">{message}</p>
+              <p id="errorMessage" className="helper" role="alert" aria-live="assertive">{message}</p>
             </form>
           </div>
         </div>
